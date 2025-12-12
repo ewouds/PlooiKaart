@@ -35,7 +35,7 @@ export default function Dashboard() {
       </section>
 
       <nav>
-        <Link to='/meetings/new'>Register Meeting</Link> | <Link to='/audit'>Audit Trail</Link>
+        <Link to='/meetings/new'>Register Meeting</Link> | <Link to='/audit'>Audit Trail</Link> | <Link to='/reglement'>Reglement</Link>
       </nav>
 
       <section style={{ marginTop: "2rem" }}>

@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import MeetingForm from "./pages/MeetingForm";
 import PasswordResetConfirm from "./pages/PasswordResetConfirm";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
+import Reglement from "./pages/Reglement";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, loading } = useAuth();
@@ -42,6 +43,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <AuditTrail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/reglement'
+        element={
+          <ProtectedRoute>
+            <Reglement />
           </ProtectedRoute>
         }
       />
