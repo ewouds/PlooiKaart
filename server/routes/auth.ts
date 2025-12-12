@@ -6,6 +6,8 @@ import { AuditEvent } from '../models/AuditEvent';
 import { PasswordResetToken } from '../models/PasswordResetToken';
 import { User } from '../models/User';
 
+import { sendPasswordResetEmail } from '../utils/email';
+
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
@@ -58,34 +60,52 @@ router.post('/password-reset/request', async (req, res) => {
   });
 
   const resetLink = `${process.env.PUBLIC_URL}/reset-password?token=${token}&id=${user._id}`;
-  console.log(`[DEV-MODE] Password reset link for ${user.username}: ${resetLink}`);
+  
+  try {
+    await sendPasswordResetEmail(user.email, resetLink);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    // Don't fail the request, just log the error. 
+    // In a real app you might want to retry or alert.
+  }
 
   res.json({ message: 'If the user exists, a reset link has been sent.' });
 });
 
 router.post('/password-reset/confirm', async (req, res) => {
   const { userId, token, newPassword } = req.body;
+  console.log(`[DEBUG] Reset confirm for user: ${userId}`);
 
-  const resetToken = await PasswordResetToken.findOne({
+  const resetTokens = await PasswordResetToken.find({
     userId,
     expiresAt: { $gt: new Date() },
     usedAt: null,
   });
 
-  if (!resetToken) {
+  if (resetTokens.length === 0) {
+    console.log('[DEBUG] No valid reset token found in DB (or expired/used)');
     return res.status(400).json({ message: 'Invalid or expired token' });
   }
 
-  const validToken = await bcrypt.compare(token, resetToken.tokenHash);
-  if (!validToken) {
+  let validResetTokenDoc = null;
+  for (const doc of resetTokens) {
+    const isValid = await bcrypt.compare(token, doc.tokenHash);
+    if (isValid) {
+      validResetTokenDoc = doc;
+      break;
+    }
+  }
+
+  if (!validResetTokenDoc) {
+    console.log('[DEBUG] Token hash mismatch (checked against ' + resetTokens.length + ' valid tokens)');
     return res.status(400).json({ message: 'Invalid or expired token' });
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await User.findByIdAndUpdate(userId, { passwordHash });
 
-  resetToken.usedAt = new Date();
-  await resetToken.save();
+  validResetTokenDoc.usedAt = new Date();
+  await validResetTokenDoc.save();
 
   await AuditEvent.create({
     actorUserId: userId,
