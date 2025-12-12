@@ -1,0 +1,12 @@
+﻿{
+    "settings":  {
+                     "files.exclude":  {
+                                           "**/.git":  false
+                                       }
+                 },
+    "folders":  [
+                    {
+                        "path":  "."
+                    }
+                ]
+}
