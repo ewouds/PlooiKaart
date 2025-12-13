@@ -37,15 +37,15 @@ jobs:
               run: |
                   az acr login --name ${{ env.ACR_NAME }}
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  push: true
-                  tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-                  file: ./Dockerfile
-
-            - name: Configure Container App Registry Access
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          file: ./Dockerfile            - name: Configure Container App Registry Access
               # This step ensures the Container App has the credentials to pull from the ACR
               run: |
                   az containerapp registry set \
