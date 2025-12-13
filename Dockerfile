@@ -17,6 +17,9 @@ RUN npm run build:server
 # Remove devDependencies to keep image small
 RUN npm prune --production
 
+# Set NODE_ENV to production
+ENV NODE_ENV=production
+
 # Expose the port
 EXPOSE 3000
 

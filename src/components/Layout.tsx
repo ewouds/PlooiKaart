@@ -8,6 +8,7 @@ import { Outlet } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useThemeContext } from "../context/ThemeContext";
+import { InstallPWA } from "./InstallPWA";
 
 export default function Layout() {
   const { user, logout, login } = useAuth();
@@ -130,6 +131,7 @@ export default function Layout() {
           </Button>
         </DialogActions>
       </Dialog>
+      <InstallPWA />
     </>
   );
 }
