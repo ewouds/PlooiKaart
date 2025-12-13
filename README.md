@@ -36,6 +36,12 @@ For detailed setup instructions, including database configuration and troublesho
 
 We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to set up your development environment and submit pull requests.
 
+## Uploads & Azure Storage
+
+- The backend handles uploads and streams them to Azure Blob Storage using the `AZURE_STORAGE_CONNECTION_STRING` environment variable.
+- For local development, set `AZURE_STORAGE_CONNECTION_STRING` in your `.env` (see `.env.example`).
+- For CI/CD and production, add the connection string to **GitHub Secrets** (Settings → Secrets and variables → Actions) and avoid committing any secrets to the repo. Prefer Managed Identity or Key Vault in production.
+
 ## Tech Stack
 
 - **Frontend**: React, Vite, TypeScript, Material UI

@@ -36,6 +36,17 @@ jobs:
             const coredemo = require('@actions/core')
             return await coredemo.getIDToken()
           result-encoding: string
+      - name: Pre-check required secrets
+        run: |
+          if [ "${{ env.REQUIRE_AZURE_STORAGE_SECRET }}" = "true" ] && [ -z "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" ]; then
+            echo "Required secret AZURE_STORAGE_CONNECTION_STRING is missing. Add it in Settings -> Secrets -> Actions." >&2
+            exit 1
+          else
+            echo "Secret check passed (or not required)."
+          fi
+        env:
+          REQUIRE_AZURE_STORAGE_SECRET: ${{ vars.REQUIRE_AZURE_STORAGE_SECRET || 'false' }}
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -50,7 +61,10 @@ jobs:
           github_id_token: ${{ steps.idtoken.outputs.result }}
         env:
           VITE_API_URL: "https://plooi-backend.salmonwave-d4ae9b1d.westeurope.azurecontainerapps.io"
-          VITE_AZURE_STORAGE_SAS_URL: "https://plooi.blob.core.windows.net/?sv=2024-11-04&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-12-13T05:54:04Z&st=2025-12-12T21:39:04Z&spr=https,http&sig=aNZ%2B26p4tvvh6yARq24vPPU80DC5LflJZ8BttcmDE%2B4%3D"
+          # Do NOT store long-lived SAS tokens here. Server-side uploads now use AZURE_STORAGE_CONNECTION_STRING.
+          # Add the connection string as a GitHub Secret if CI needs to run server-side upload tests:
+          #   Name: AZURE_STORAGE_CONNECTION_STRING
+          #   Value: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

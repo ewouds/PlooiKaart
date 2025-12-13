@@ -37,7 +37,9 @@ Before you begin, ensure you have the following installed:
     - `PUBLIC_URL`: The URL where the frontend is running (default: `http://localhost:5173`).
     - `PORT`: The port for the backend server (default: `3000`).
     - `VITE_API_URL`: The URL of the backend API (default: `http://localhost:3000`).
-    - `VITE_AZURE_STORAGE_SAS_URL`: (Optional) SAS URL for Azure Blob Storage if you want to test profile picture uploads.
+    - `AZURE_STORAGE_CONNECTION_STRING`: Connection string for Azure Storage (preferred for local development). Example: `DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net`.
+      - For production, prefer using **Azure Key Vault** or **Managed Identity** instead of storing keys in plain text.
+      - Do **not** commit secrets. Add them to GitHub repository Secrets if CI needs them.
     - `SMTP_*`: (Optional) Email settings. If not provided, password reset links will be logged to the backend console.
 
 ## Database Setup
@@ -108,5 +110,20 @@ npm run lint
   5. Open the link to set a password.
 
 - **CORS errors**: Ensure `PUBLIC_URL` in `.env` matches your frontend URL.
+
+- **Uploads failing with 403/AuthenticationFailed**: We no longer embed SAS tokens in the frontend. The backend now accepts file uploads and streams them to Azure Storage using `AZURE_STORAGE_CONNECTION_STRING`.
+  - Locally: set `AZURE_STORAGE_CONNECTION_STRING` in your `.env`.
+  - In CI/CD: add a repository secret named `AZURE_STORAGE_CONNECTION_STRING` (or `AZURE_STORAGE_CONNECTION_STRING_PROD`) in **Settings > Secrets and variables > Actions**. Do not commit this value to the repository.
+  - If you must allow client-side uploads (not recommended), implement a server endpoint that issues a short-lived SAS for a specific blob.
+
+### Adding the secret to GitHub
+
+1. Go to your repository on GitHub.
+2. Click **Settings** → **Secrets and variables** → **Actions**.
+3. Click **New repository secret**.
+4. Enter **Name**: `AZURE_STORAGE_CONNECTION_STRING`.
+5. Enter the **Value** (connection string) and **Add secret**.
+
+Optional: If you want the CI workflow to fail when the secret is missing, create a repository variable named `REQUIRE_AZURE_STORAGE_SECRET` and set it to `true` under **Settings → Secrets and variables → Actions → Variables**. The workflow includes a pre-check that will error if the variable is `true` and the secret is not present.
 
 Thank you for contributing!
