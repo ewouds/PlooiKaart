@@ -5,15 +5,15 @@ on:
     branches:
       - main
     paths:
-      - 'server/**'
-      - 'package.json'
-      - 'Dockerfile'
-      - '.github/workflows/deploy-backend.yml'
+      - "server/**"
+      - "package.json"
+      - "Dockerfile"
+      - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
 
 env:
   ACR_NAME: "ewsacr1747"
-  CONTAINER_APP_NAME: "plooikaart-backend"
+  CONTAINER_APP_NAME: "plooi-backend"
   RESOURCE_GROUP: "rg-plooikaart"
   IMAGE_NAME: "plooikaart-backend"
 
