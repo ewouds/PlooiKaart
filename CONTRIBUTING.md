@@ -100,6 +100,7 @@ npm run lint
 ## Troubleshooting
 
 - **Login fails locally**: The seeded users (ewoud, tom, etc.) do not have passwords initially. You must use the "Forgot Password" flow.
+
   1. Go to `/login`.
   2. Click "Forgot Password?".
   3. Enter a username (e.g., `ewoud`).

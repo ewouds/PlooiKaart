@@ -131,7 +131,14 @@ router2.post("/login", async (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
   const token = jwt2.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1d" });
-  res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1e3 });
+  const isProduction = process.env.NODE_ENV === "production";
+  res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1e3,
+    // 1 day
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction
+  });
   res.json({ message: "Logged in" });
 });
 router2.post("/logout", (req, res) => {
@@ -298,7 +305,6 @@ async function calculateScores() {
   const meetings = await Meeting.find({
     date: { $gte: startOfYear, $lte: endOfYear }
   });
-  console.log(`Calculating scores for ${users.length} users and ${meetings.length} meetings.`);
   const scores = users.map((user) => {
     let score = 5;
     if (user.isPilot) score += 5;
@@ -316,7 +322,6 @@ async function calculateScores() {
       }
     }
     score = score + topUps - penalties;
-    console.log(`User: ${user.displayName}, Score: ${score} (Base: ${user.isPilot ? 10 : 5}, TopUps: ${topUps}, Penalties: ${penalties})`);
     return {
       ...user.toObject(),
       score
@@ -455,6 +460,7 @@ var __filename = fileURLToPath(import.meta.url);
 var __dirname = path.dirname(__filename);
 dotenv2.config();
 var app = express5();
+app.set("trust proxy", 1);
 var PORT = process.env.PORT || 3e3;
 var allowedOrigins = [
   "http://localhost:5173",
@@ -468,11 +474,23 @@ app.use(cors({
 }));
 app.use(express5.json());
 app.use(cookieParser());
+app.get("/", (req, res) => {
+  res.json({
+    service: "PlooiKaart Backend API",
+    status: "healthy",
+    endpoints: {
+      auth: "/auth",
+      meetings: "/meetings",
+      audit: "/audit",
+      users: "/users"
+    },
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  });
+});
 app.use("/auth", auth_default);
 app.use("/meetings", meetings_default);
 app.use("/audit", audit_default);
 app.use("/users", users_default);
-app.use(express5.static(path.join(__dirname, "../dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
 });

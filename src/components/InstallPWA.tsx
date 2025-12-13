@@ -1,11 +1,11 @@
-import CloseIcon from '@mui/icons-material/Close';
-import DownloadIcon from '@mui/icons-material/Download';
-import { Button, IconButton, Snackbar } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import CloseIcon from "@mui/icons-material/Close";
+import DownloadIcon from "@mui/icons-material/Download";
+import { Button, IconButton, Snackbar } from "@mui/material";
+import React, { useEffect, useState } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
 export const InstallPWA: React.FC = () => {
@@ -22,10 +22,10 @@ export const InstallPWA: React.FC = () => {
       setOpen(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener("beforeinstallprompt", handler);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener("beforeinstallprompt", handler);
     };
   }, []);
 
@@ -44,7 +44,7 @@ export const InstallPWA: React.FC = () => {
     setOpen(false);
   };
 
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -57,20 +57,15 @@ export const InstallPWA: React.FC = () => {
     <Snackbar
       open={open}
       onClose={handleClose}
-      message="Install PlooiKaart for a better experience"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      message='Install PlooiKaart for a better experience'
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       action={
         <React.Fragment>
-          <Button color="primary" size="small" onClick={handleInstallClick} startIcon={<DownloadIcon />}>
+          <Button color='primary' size='small' onClick={handleInstallClick} startIcon={<DownloadIcon />}>
             Install
           </Button>
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={handleClose}
-          >
-            <CloseIcon fontSize="small" />
+          <IconButton size='small' aria-label='close' color='inherit' onClick={handleClose}>
+            <CloseIcon fontSize='small' />
           </IconButton>
         </React.Fragment>
       }

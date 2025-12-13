@@ -5,12 +5,13 @@ A scoring system application for the PlooiKaart group.
 ## Quick Start
 
 1.  **Install dependencies**:
+
     ```bash
     npm install
     ```
 
-2.  **Configure environment**:
-    Copy `.env.example` to `.env` and adjust settings if necessary.
+2.  **Configure environment**: Copy `.env.example` to `.env` and adjust settings if necessary.
+
     ```bash
     cp .env.example .env
     ```
