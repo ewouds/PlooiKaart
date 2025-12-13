@@ -45,7 +45,7 @@ export const InstallPWA: React.FC = () => {
   };
 
   const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpen(false);

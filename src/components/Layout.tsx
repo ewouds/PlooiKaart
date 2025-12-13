@@ -1,8 +1,8 @@
-import React, { useState } from "react";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AppBar, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField, Toolbar } from "@mui/material";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -29,16 +29,16 @@ export default function Layout() {
     setUploading(true);
     try {
       const form = new FormData();
-      form.append('file', file);
+      form.append("file", file);
 
-      const res = await client.post('/upload/upload', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const res = await client.post("/upload/upload", form, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       setEditProfilePicture(res.data.url);
     } catch (error) {
-      console.error('Upload failed', error);
-      alert('Failed to upload image');
+      console.error("Upload failed", error);
+      alert("Failed to upload image");
     } finally {
       setUploading(false);
     }

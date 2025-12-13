@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auditRoutes from './routes/audit';
-import uploadRoutes from './routes/upload';
 import authRoutes from './routes/auth';
 import meetingRoutes from './routes/meetings';
+import uploadRoutes from './routes/upload';
 import userRoutes from './routes/users';
 import { seedUsers } from './seed';
 
