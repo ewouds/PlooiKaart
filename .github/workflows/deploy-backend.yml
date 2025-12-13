@@ -1,60 +1,60 @@
 name: Deploy Backend to Azure Container App
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'server/**'
-      - 'package.json'
-      - 'Dockerfile'
-      - '.github/workflows/deploy-backend.yml'
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths:
+            - "server/**"
+            - "package.json"
+            - "Dockerfile"
+            - ".github/workflows/deploy-backend.yml"
+    workflow_dispatch:
 
 env:
-  # TODO: Update these values with your Azure resources
-  ACR_NAME: "ewsacr1747" # Example: myregistry
-  CONTAINER_APP_NAME: "plooikaart-backend" # Example: my-backend-app
-  RESOURCE_GROUP: "rg-plooikaart" # Example: my-resource-group
-  IMAGE_NAME: "plooikaart-backend"
+    # TODO: Update these values with your Azure resources
+    ACR_NAME: "ewsacr1747" # Example: myregistry
+    CONTAINER_APP_NAME: "plooikaart-backend" # Example: my-backend-app
+    RESOURCE_GROUP: "rg-plooikaart" # Example: my-resource-group
+    IMAGE_NAME: "plooikaart-backend"
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+            - name: Log in to Azure
+              uses: azure/login@v1
+              with:
+                  creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Log in to Azure Container Registry
-        run: |
-          az acr login --name ${{ env.ACR_NAME }}
+            - name: Log in to Azure Container Registry
+              run: |
+                  az acr login --name ${{ env.ACR_NAME }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ env.ACR_NAME }.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          file: ./Dockerfile
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ env.ACR_NAME }.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                  file: ./Dockerfile
 
-      - name: Deploy to Azure Container App
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          acrName: ${{ env.ACR_NAME }}
-          containerAppName: ${{ env.CONTAINER_APP_NAME }}
-          resourceGroup: ${{ env.RESOURCE_GROUP }}
-          imageToDeploy: ${{ env.ACR_NAME }.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          targetPort: 3000
-          environmentVariables: |
-            MONGODB_URI=${{ secrets.MONGODB_URI }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            NODE_ENV=production
+            - name: Deploy to Azure Container App
+              uses: azure/container-apps-deploy-action@v1
+              with:
+                  acrName: ${{ env.ACR_NAME }}
+                  containerAppName: ${{ env.CONTAINER_APP_NAME }}
+                  resourceGroup: ${{ env.RESOURCE_GROUP }}
+                  imageToDeploy: ${{ env.ACR_NAME }.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                  targetPort: 3000
+                  environmentVariables: |
+                      MONGODB_URI=${{ secrets.MONGODB_URI }}
+                      JWT_SECRET=${{ secrets.JWT_SECRET }}
+                      NODE_ENV=production
