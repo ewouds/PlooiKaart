@@ -71,6 +71,51 @@ var userSchema = new mongoose3.Schema({
 }, { timestamps: true });
 var User = mongoose3.model("User", userSchema);
 
+// server/utils/email.ts
+import nodemailer from "nodemailer";
+var transporter = null;
+function getTransporter() {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_SECURE === "true",
+      // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+  }
+  return transporter;
+}
+async function sendPasswordResetEmail(to, resetLink) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
+    console.log("================================================");
+    console.log("SMTP not configured. Password reset link:");
+    console.log(resetLink);
+    console.log("================================================");
+    return;
+  }
+  const info = await getTransporter().sendMail({
+    from: `"PlooiKaart" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    to,
+    subject: "Password Reset Request",
+    text: `You requested a password reset. Click the link below to reset your password:
+
+${resetLink}
+
+If you did not request this, please ignore this email.`,
+    html: `
+      <p>You requested a password reset.</p>
+      <p>Click the link below to reset your password:</p>
+      <a href="${resetLink}">${resetLink}</a>
+      <p>If you did not request this, please ignore this email.</p>
+    `
+  });
+  console.log("Message sent: %s", info.messageId);
+}
+
 // server/routes/auth.ts
 var router2 = express2.Router();
 router2.post("/login", async (req, res) => {
@@ -111,27 +156,41 @@ router2.post("/password-reset/request", async (req, res) => {
     data: { email: user.email }
   });
   const resetLink = `${process.env.PUBLIC_URL}/reset-password?token=${token}&id=${user._id}`;
-  console.log(`[DEV-MODE] Password reset link for ${user.username}: ${resetLink}`);
+  try {
+    await sendPasswordResetEmail(user.email, resetLink);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
   res.json({ message: "If the user exists, a reset link has been sent." });
 });
 router2.post("/password-reset/confirm", async (req, res) => {
   const { userId, token, newPassword } = req.body;
-  const resetToken = await PasswordResetToken.findOne({
+  console.log(`[DEBUG] Reset confirm for user: ${userId}`);
+  const resetTokens = await PasswordResetToken.find({
     userId,
     expiresAt: { $gt: /* @__PURE__ */ new Date() },
     usedAt: null
   });
-  if (!resetToken) {
+  if (resetTokens.length === 0) {
+    console.log("[DEBUG] No valid reset token found in DB (or expired/used)");
     return res.status(400).json({ message: "Invalid or expired token" });
   }
-  const validToken = await bcrypt.compare(token, resetToken.tokenHash);
-  if (!validToken) {
+  let validResetTokenDoc = null;
+  for (const doc of resetTokens) {
+    const isValid = await bcrypt.compare(token, doc.tokenHash);
+    if (isValid) {
+      validResetTokenDoc = doc;
+      break;
+    }
+  }
+  if (!validResetTokenDoc) {
+    console.log("[DEBUG] Token hash mismatch (checked against " + resetTokens.length + " valid tokens)");
     return res.status(400).json({ message: "Invalid or expired token" });
   }
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await User.findByIdAndUpdate(userId, { passwordHash });
-  resetToken.usedAt = /* @__PURE__ */ new Date();
-  await resetToken.save();
+  validResetTokenDoc.usedAt = /* @__PURE__ */ new Date();
+  await validResetTokenDoc.save();
   await AuditEvent.create({
     actorUserId: userId,
     type: "PASSWORD_RESET_COMPLETED"
@@ -267,10 +326,10 @@ import dotenv from "dotenv";
 dotenv.config();
 var SEED_USERS = [
   { displayName: "Ewoud", username: "ewoud", email: "ewoud.smets@gmail.com", isPilot: false },
-  { displayName: "Tom", username: "tom", email: "tom@mail.com", isPilot: false },
-  { displayName: "Dave", username: "dave", email: "dave@mail.com", isPilot: false },
-  { displayName: "Birger", username: "birger", email: "birger@mail.com", isPilot: true },
-  { displayName: "Bert", username: "bert", email: "bert@mail.com", isPilot: false }
+  { displayName: "Tom", username: "tom", email: "tom.vanrossom@gmail.com", isPilot: false },
+  { displayName: "Dave", username: "dave", email: "davedekaey@gmail.com", isPilot: false },
+  { displayName: "Birger", username: "birger", email: "birger.vandenbrande@gmail.com", isPilot: true },
+  { displayName: "Bert", username: "bert", email: "bgossey@hotmail.com", isPilot: false }
 ];
 async function seedUsers() {
   for (const u of SEED_USERS) {

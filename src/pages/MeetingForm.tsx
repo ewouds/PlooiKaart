@@ -1,10 +1,43 @@
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import client from "../api/client";
 
 interface User {
   _id: string;
   displayName: string;
+  profilePicture?: string;
 }
 
 interface TopUp {
@@ -15,22 +48,60 @@ interface TopUp {
 
 export default function MeetingForm() {
   const [users, setUsers] = useState<User[]>([]);
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [presentIds, setPresentIds] = useState<string[]>([]);
   const [excusedIds, setExcusedIds] = useState<string[]>([]);
   const [topUps, setTopUps] = useState<TopUp[]>([]);
   const [error, setError] = useState("");
+  const [openConfirm, setOpenConfirm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     client.get("/users/scores").then((res) => setUsers(res.data));
   }, []);
 
-  const handleCheckbox = (id: string, list: string[], setList: (l: string[]) => void) => {
-    if (list.includes(id)) {
-      setList(list.filter((x) => x !== id));
+  useEffect(() => {
+    if (date) {
+      const dateStr = date.format("YYYY-MM-DD");
+      client
+        .get(`/meetings/${dateStr}`)
+        .then((res) => {
+          const meeting = res.data;
+          setPresentIds(meeting.presentUserIds || []);
+          setExcusedIds(meeting.excusedUserIds || []);
+          // Ensure topUps match the interface (strip _id if necessary, though extra props are usually fine)
+          setTopUps(
+            (meeting.topUps || []).map((t: any) => ({
+              userId: t.userId,
+              amount: t.amount,
+              comment: t.comment || "",
+            }))
+          );
+          setError("");
+        })
+        .catch((err) => {
+          if (err.response && err.response.status === 404) {
+            // No meeting found, clear form
+            setPresentIds([]);
+            setExcusedIds([]);
+            setTopUps([]);
+          } else {
+            console.error("Failed to fetch meeting", err);
+          }
+        });
+    }
+  }, [date]);
+
+  const handleAttendanceChange = (userId: string, newStatus: string | null) => {
+    if (newStatus === "present") {
+      setPresentIds((prev) => [...prev, userId]);
+      setExcusedIds((prev) => prev.filter((id) => id !== userId));
+    } else if (newStatus === "excused") {
+      setExcusedIds((prev) => [...prev, userId]);
+      setPresentIds((prev) => prev.filter((id) => id !== userId));
     } else {
-      setList([...list, id]);
+      setPresentIds((prev) => prev.filter((id) => id !== userId));
+      setExcusedIds((prev) => prev.filter((id) => id !== userId));
     }
   };
 
@@ -55,12 +126,6 @@ export default function MeetingForm() {
     setError("");
 
     // Client-side validation
-    const d = new Date(date);
-    if (d.getDay() !== 4) {
-      setError("Meeting date must be a Thursday");
-      return;
-    }
-
     const presentSet = new Set(presentIds);
     for (const id of excusedIds) {
       if (presentSet.has(id)) {
@@ -78,87 +143,171 @@ export default function MeetingForm() {
 
     try {
       await client.post("/meetings", {
-        date,
+        date: date ? date.format("YYYY-MM-DD") : "",
         presentUserIds: presentIds,
         excusedUserIds: excusedIds,
         topUps,
       });
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to submit meeting");
+      if (err.response?.status === 409 && err.response?.data?.code === "MEETING_EXISTS") {
+        setOpenConfirm(true);
+      } else {
+        setError(err.response?.data?.message || "Failed to submit meeting");
+      }
+    }
+  };
+
+  const handleConfirmOverwrite = async () => {
+    try {
+      await client.post("/meetings", {
+        date: date ? date.format("YYYY-MM-DD") : "",
+        presentUserIds: presentIds,
+        excusedUserIds: excusedIds,
+        topUps,
+        overwrite: true,
+      });
+      setOpenConfirm(false);
+      navigate("/");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to overwrite meeting");
+      setOpenConfirm(false);
     }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Register Meeting</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <Container maxWidth='sm' sx={{ mt: 2, pb: 4 }}>
+      <Button component={RouterLink} to='/' startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
+        Back to Dashboard
+      </Button>
+
+      <Typography variant='h4' gutterBottom>
+        Register Meeting
+      </Typography>
+
+      {error && (
+        <Alert severity='error' sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Date (Thursday): </label>
-          <input type='date' value={date} onChange={(e) => setDate(e.target.value)} required />
-        </div>
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label='Date'
+                value={date}
+                onChange={(newValue) => setDate(newValue)}
+                slotProps={{ textField: { fullWidth: true, required: true } }}
+              />
+            </LocalizationProvider>
+          </CardContent>
+        </Card>
 
-        <div style={{ display: "flex", gap: "2rem", marginBottom: "1rem" }}>
-          <div>
-            <h3>Present</h3>
-            {users.map((u) => (
-              <div key={`p-${u._id}`}>
-                <label>
-                  <input
-                    type='checkbox'
-                    checked={presentIds.includes(u._id)}
-                    onChange={() => handleCheckbox(u._id, presentIds, setPresentIds)}
-                    disabled={excusedIds.includes(u._id)}
-                  />
-                  {u.displayName}
-                </label>
-              </div>
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            <Typography variant='h6' gutterBottom>
+              Attendance
+            </Typography>
+            <Stack spacing={2}>
+              {users.map((u) => {
+                let status = null;
+                if (presentIds.includes(u._id)) status = "present";
+                else if (excusedIds.includes(u._id)) status = "excused";
+
+                return (
+                  <Box
+                    key={u._id}
+                    sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #eee", pb: 1 }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                      <Avatar src={u.profilePicture} sx={{ width: 32, height: 32 }}>
+                        {!u.profilePicture && u.displayName.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <Typography variant='body1' fontWeight='medium'>
+                        {u.displayName}
+                      </Typography>
+                    </Box>
+                    <ToggleButtonGroup value={status} exclusive onChange={(_, newStatus) => handleAttendanceChange(u._id, newStatus)} size='small'>
+                      <ToggleButton value='present' color='success' sx={{ px: 2 }}>
+                        <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} /> Present
+                      </ToggleButton>
+                      <ToggleButton value='excused' color='warning' sx={{ px: 2 }}>
+                        <HelpOutlineIcon fontSize='small' sx={{ mr: 1 }} /> Excused
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Box>
+                );
+              })}
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            <Typography variant='h6' gutterBottom>
+              Top-Ups (Buy 5 Plooikaarten)
+            </Typography>
+
+            {topUps.map((t, i) => (
+              <Box key={i} sx={{ p: 2, bgcolor: "background.default", borderRadius: 2, mb: 2, border: "1px solid", borderColor: "divider" }}>
+                <FormControl fullWidth margin='normal'>
+                  <InputLabel>User</InputLabel>
+                  <Select value={t.userId} label='User' onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
+                    {users.map((u) => (
+                      <MenuItem key={u._id} value={u._id}>
+                        {u.displayName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label='Comment'
+                  value={t.comment}
+                  onChange={(e) => updateTopUp(i, "comment", e.target.value)}
+                  placeholder='Reason (e.g. Rondje)'
+                  fullWidth
+                  margin='normal'
+                />
+
+                <Button variant='outlined' color='error' startIcon={<DeleteIcon />} onClick={() => removeTopUp(i)} fullWidth sx={{ mt: 1 }}>
+                  Remove
+                </Button>
+              </Box>
             ))}
-          </div>
-          <div>
-            <h3>Excused (Valid Reason)</h3>
-            {users.map((u) => (
-              <div key={`e-${u._id}`}>
-                <label>
-                  <input
-                    type='checkbox'
-                    checked={excusedIds.includes(u._id)}
-                    onChange={() => handleCheckbox(u._id, excusedIds, setExcusedIds)}
-                    disabled={presentIds.includes(u._id)}
-                  />
-                  {u.displayName}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <div style={{ marginBottom: "1rem" }}>
-          <h3>Top-Ups (Buy Plooikaarten)</h3>
-          {topUps.map((t, i) => (
-            <div key={i} style={{ marginBottom: "0.5rem", display: "flex", gap: "0.5rem" }}>
-              <select value={t.userId} onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
-                {users.map((u) => (
-                  <option key={u._id} value={u._id}>
-                    {u.displayName}
-                  </option>
-                ))}
-              </select>
-              <input type='number' value={t.amount} onChange={(e) => updateTopUp(i, "amount", parseInt(e.target.value))} step='5' min='5' />
-              <input type='text' placeholder='Comment' value={t.comment} onChange={(e) => updateTopUp(i, "comment", e.target.value)} />
-              <button type='button' onClick={() => removeTopUp(i)}>
-                Remove
-              </button>
-            </div>
-          ))}
-          <button type='button' onClick={addTopUp}>
-            Add Top-Up
-          </button>
-        </div>
+            <Button variant='outlined' startIcon={<AddIcon />} onClick={addTopUp} fullWidth>
+              Add Top Up
+            </Button>
+          </CardContent>
+        </Card>
 
-        <button type='submit'>Submit Meeting</button>
+        <Button type='submit' variant='contained' size='large' fullWidth>
+          Submit Meeting
+        </Button>
       </form>
-    </div>
+
+      <Dialog
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{"Meeting Already Exists"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            A meeting for this date already exists. Do you want to overwrite it with these new settings?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirm(false)}>Cancel</Button>
+          <Button onClick={handleConfirmOverwrite} autoFocus color='error'>
+            Overwrite
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
   );
 }

@@ -6,20 +6,27 @@ import { User } from '../models/User';
 
 const router = express.Router();
 
+router.get('/:date', authenticateToken, async (req, res) => {
+  const { date } = req.params;
+  const meeting = await Meeting.findOne({ date });
+  if (!meeting) {
+    return res.status(404).json({ message: 'Meeting not found' });
+  }
+  res.json(meeting);
+});
+
 router.post('/', authenticateToken, async (req: AuthRequest, res) => {
-  const { date, presentUserIds, excusedUserIds, topUps } = req.body;
+  const { date, presentUserIds, excusedUserIds, topUps, overwrite } = req.body;
+  console.log(`Creating meeting for date: ${date} (overwrite: ${overwrite})`);
   const userId = req.user?.userId;
 
-  // 1. Validate Date is Thursday
-  const d = new Date(date);
-  if (d.getDay() !== 4) {
-    return res.status(400).json({ message: 'Meetings must be on a Thursday' });
-  }
-
   // 2. Validate Unique Date
-  const existing = await Meeting.findOne({ date });
-  if (existing) {
-    return res.status(400).json({ message: 'A meeting for this date already exists' });
+  let meeting = await Meeting.findOne({ date });
+  if (meeting) {
+    if (!overwrite) {
+      return res.status(409).json({ code: 'MEETING_EXISTS', message: 'A meeting for this date already exists' });
+    }
+    // If overwrite is true, we proceed to update the existing meeting
   }
 
   // 3. Validate Disjoint
@@ -40,14 +47,25 @@ router.post('/', authenticateToken, async (req: AuthRequest, res) => {
     }
   }
 
-  // Create Meeting
-  const meeting = await Meeting.create({
-    date,
-    presentUserIds,
-    excusedUserIds,
-    topUps,
-    createdByUserId: userId,
-  });
+  // Create or Update Meeting
+  if (meeting) {
+    // Update existing
+    meeting.presentUserIds = presentUserIds;
+    meeting.excusedUserIds = excusedUserIds;
+    meeting.topUps = topUps;
+    // We keep the original createdByUserId or update it? Usually keep original creator, but maybe track last modifier.
+    // For now, let's just update the fields.
+    await meeting.save();
+  } else {
+    // Create new
+    meeting = await Meeting.create({
+      date,
+      presentUserIds,
+      excusedUserIds,
+      topUps,
+      createdByUserId: userId,
+    });
+  }
 
   // Calculate penalties for audit
   const allUsers = await User.find({});
@@ -63,11 +81,11 @@ router.post('/', authenticateToken, async (req: AuthRequest, res) => {
 
   await AuditEvent.create({
     actorUserId: userId,
-    type: 'MEETING_SUBMITTED',
+    type: overwrite ? 'MEETING_OVERWRITTEN' : 'MEETING_SUBMITTED',
     data: auditData
   });
 
-  res.status(201).json(meeting);
+  res.status(meeting.isNew ? 201 : 200).json(meeting);
 });
 
 export default router;

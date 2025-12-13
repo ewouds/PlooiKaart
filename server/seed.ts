@@ -5,10 +5,10 @@ dotenv.config();
 
 const SEED_USERS = [
   { displayName: 'Ewoud', username: 'ewoud', email: 'ewoud.smets@gmail.com', isPilot: false },
-  { displayName: 'Tom', username: 'tom', email: 'tom@mail.com', isPilot: false },
-  { displayName: 'Dave', username: 'dave', email: 'dave@mail.com', isPilot: false },
-  { displayName: 'Birger', username: 'birger', email: 'birger@mail.com', isPilot: true },
-  { displayName: 'Bert', username: 'bert', email: 'bert@mail.com', isPilot: false },
+  { displayName: 'Tom', username: 'tom', email: 'tom.vanrossom@gmail.com', isPilot: false },
+  { displayName: 'Dave', username: 'dave', email: 'davedekaey@gmail.com', isPilot: false },
+  { displayName: 'Birger', username: 'birger', email: 'birger.vandenbrande@gmail.com', isPilot: true },
+  { displayName: 'Bert', username: 'bert', email: 'bgossey@hotmail.com', isPilot: false },
 ];
 
 export async function seedUsers() {

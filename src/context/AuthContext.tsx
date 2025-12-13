@@ -7,6 +7,8 @@ interface User {
   username: string;
   email: string;
   isPilot: boolean;
+  theme?: "light" | "dark";
+  profilePicture?: string;
 }
 
 interface AuthContextType {

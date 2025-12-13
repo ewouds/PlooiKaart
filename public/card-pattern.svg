@@ -1,0 +1,9 @@
+<svg width="60" height="80" viewBox="0 0 60 80"
+    xmlns="http://www.w3.org/2000/svg">
+    <g opacity="0.1">
+        <!-- Card Outline -->
+        <rect x="10" y="10" width="40" height="60" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+        <!-- Center Symbol (Diamond-ish) -->
+        <path d="M30 25 L40 40 L30 55 L20 40 Z" fill="currentColor"/>
+    </g>
+</svg>

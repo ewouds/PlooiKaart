@@ -11,7 +11,7 @@ const EXCLUDED_EVENT_TYPES = [
 
 router.get('/', authenticateToken, async (req, res) => {
   const events = await AuditEvent.find({ type: { $nin: EXCLUDED_EVENT_TYPES } })
-    .populate('actorUserId', 'displayName username')
+    .populate('actorUserId', 'displayName username profilePicture')
     .sort({ timestamp: -1 }); // Newest first
   res.json(events);
 });
