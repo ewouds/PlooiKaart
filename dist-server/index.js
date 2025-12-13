@@ -39,7 +39,7 @@ var EXCLUDED_EVENT_TYPES = [
   "PASSWORD_RESET_REQUESTED"
 ];
 router.get("/", authenticateToken, async (req, res) => {
-  const events = await AuditEvent.find({ type: { $nin: EXCLUDED_EVENT_TYPES } }).populate("actorUserId", "displayName username").sort({ timestamp: -1 });
+  const events = await AuditEvent.find({ type: { $nin: EXCLUDED_EVENT_TYPES } }).populate("actorUserId", "displayName username profilePicture").sort({ timestamp: -1 });
   res.json(events);
 });
 var audit_default = router;
@@ -67,6 +67,8 @@ var userSchema = new mongoose3.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   isPilot: { type: Boolean, default: false },
+  theme: { type: String, default: "light" },
+  profilePicture: { type: String },
   passwordHash: { type: String }
 }, { timestamps: true });
 var User = mongoose3.model("User", userSchema);
@@ -220,16 +222,23 @@ var Meeting = mongoose4.model("Meeting", meetingSchema);
 
 // server/routes/meetings.ts
 var router3 = express3.Router();
-router3.post("/", authenticateToken, async (req, res) => {
-  const { date, presentUserIds, excusedUserIds, topUps } = req.body;
-  const userId = req.user?.userId;
-  const d = new Date(date);
-  if (d.getDay() !== 4) {
-    return res.status(400).json({ message: "Meetings must be on a Thursday" });
+router3.get("/:date", authenticateToken, async (req, res) => {
+  const { date } = req.params;
+  const meeting = await Meeting.findOne({ date });
+  if (!meeting) {
+    return res.status(404).json({ message: "Meeting not found" });
   }
-  const existing = await Meeting.findOne({ date });
-  if (existing) {
-    return res.status(400).json({ message: "A meeting for this date already exists" });
+  res.json(meeting);
+});
+router3.post("/", authenticateToken, async (req, res) => {
+  const { date, presentUserIds, excusedUserIds, topUps, overwrite } = req.body;
+  console.log(`Creating meeting for date: ${date} (overwrite: ${overwrite})`);
+  const userId = req.user?.userId;
+  let meeting = await Meeting.findOne({ date });
+  if (meeting) {
+    if (!overwrite) {
+      return res.status(409).json({ code: "MEETING_EXISTS", message: "A meeting for this date already exists" });
+    }
   }
   const presentSet = new Set(presentUserIds);
   const excusedSet = new Set(excusedUserIds);
@@ -245,13 +254,20 @@ router3.post("/", authenticateToken, async (req, res) => {
       }
     }
   }
-  const meeting = await Meeting.create({
-    date,
-    presentUserIds,
-    excusedUserIds,
-    topUps,
-    createdByUserId: userId
-  });
+  if (meeting) {
+    meeting.presentUserIds = presentUserIds;
+    meeting.excusedUserIds = excusedUserIds;
+    meeting.topUps = topUps;
+    await meeting.save();
+  } else {
+    meeting = await Meeting.create({
+      date,
+      presentUserIds,
+      excusedUserIds,
+      topUps,
+      createdByUserId: userId
+    });
+  }
   const allUsers = await User.find({});
   const penalizedUsers = allUsers.filter(
     (u) => !presentSet.has(u._id.toString()) && !excusedSet.has(u._id.toString())
@@ -263,10 +279,10 @@ router3.post("/", authenticateToken, async (req, res) => {
   };
   await AuditEvent.create({
     actorUserId: userId,
-    type: "MEETING_SUBMITTED",
+    type: overwrite ? "MEETING_OVERWRITTEN" : "MEETING_SUBMITTED",
     data: auditData
   });
-  res.status(201).json(meeting);
+  res.status(meeting.isNew ? 201 : 200).json(meeting);
 });
 var meetings_default = router3;
 
@@ -282,6 +298,7 @@ async function calculateScores() {
   const meetings = await Meeting.find({
     date: { $gte: startOfYear, $lte: endOfYear }
   });
+  console.log(`Calculating scores for ${users.length} users and ${meetings.length} meetings.`);
   const scores = users.map((user) => {
     let score = 5;
     if (user.isPilot) score += 5;
@@ -299,6 +316,7 @@ async function calculateScores() {
       }
     }
     score = score + topUps - penalties;
+    console.log(`User: ${user.displayName}, Score: ${score} (Base: ${user.isPilot ? 10 : 5}, TopUps: ${topUps}, Penalties: ${penalties})`);
     return {
       ...user.toObject(),
       score
@@ -306,9 +324,61 @@ async function calculateScores() {
   });
   return scores;
 }
+async function calculateScoreHistory() {
+  const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
+  const startOfYear = `${currentYear}-01-01`;
+  const endOfYear = `${currentYear}-12-31`;
+  const users = await User.find({});
+  const meetings = await Meeting.find({
+    date: { $gte: startOfYear, $lte: endOfYear }
+  }).sort({ date: 1 });
+  const userScores = /* @__PURE__ */ new Map();
+  users.forEach((user) => {
+    let score = 5;
+    if (user.isPilot) score += 5;
+    userScores.set(user._id.toString(), score);
+  });
+  const history = [{
+    date: startOfYear,
+    scores: users.map((u) => ({
+      userId: u._id.toString(),
+      name: u.username,
+      score: userScores.get(u._id.toString()) || 0
+    }))
+  }];
+  for (const meeting of meetings) {
+    users.forEach((user) => {
+      const userId = user._id.toString();
+      let currentScore = userScores.get(userId) || 0;
+      const isPresent = meeting.presentUserIds.some((id) => id.toString() === userId);
+      const isExcused = meeting.excusedUserIds.some((id) => id.toString() === userId);
+      if (!isPresent && !isExcused) {
+        currentScore -= 1;
+      }
+      const userTopUps = meeting.topUps.filter((t) => t.userId?.toString() === userId);
+      for (const t of userTopUps) {
+        currentScore += t.amount;
+      }
+      userScores.set(userId, currentScore);
+    });
+    history.push({
+      date: meeting.date,
+      scores: users.map((u) => ({
+        userId: u._id.toString(),
+        name: u.username,
+        score: userScores.get(u._id.toString()) || 0
+      }))
+    });
+  }
+  return history;
+}
 
 // server/routes/users.ts
 var router4 = express4.Router();
+router4.get("/login-list", async (req, res) => {
+  const users = await User.find({}).select("displayName username profilePicture");
+  res.json(users);
+});
 router4.get("/me", authenticateToken, async (req, res) => {
   const user = await User.findById(req.user?.userId).select("-passwordHash");
   if (!user) return res.sendStatus(404);
@@ -318,6 +388,38 @@ router4.get("/scores", authenticateToken, async (req, res) => {
   const scores = await calculateScores();
   scores.sort((a, b) => b.score - a.score);
   res.json(scores);
+});
+router4.get("/scores/history", authenticateToken, async (req, res) => {
+  const history = await calculateScoreHistory();
+  res.json(history);
+});
+router4.patch("/me/theme", authenticateToken, async (req, res) => {
+  const { theme } = req.body;
+  if (!["light", "dark"].includes(theme)) {
+    return res.status(400).json({ message: "Invalid theme" });
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user?.userId,
+    { theme },
+    { new: true }
+  ).select("-passwordHash");
+  res.json(user);
+});
+router4.patch("/me", authenticateToken, async (req, res) => {
+  const { displayName, profilePicture } = req.body;
+  if (!displayName) {
+    return res.status(400).json({ message: "Display name is required" });
+  }
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user?.userId,
+      { displayName, profilePicture },
+      { new: true }
+    ).select("-passwordHash");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile" });
+  }
 });
 var users_default = router4;
 
