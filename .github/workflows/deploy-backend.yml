@@ -38,19 +38,27 @@ jobs:
               run: |
                   az acr login --name ${{ env.ACR_NAME }}
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  push: true
-                  tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-                  file: ./Dockerfile
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          file: ./Dockerfile
 
-            - name: Deploy to Azure Container App
-              uses: azure/container-apps-deploy-action@v1
-              with:
-                  acrName: ${{ env.ACR_NAME }}
-                  containerAppName: ${{ env.CONTAINER_APP_NAME }}
-                  resourceGroup: ${{ env.RESOURCE_GROUP }}
-                  imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-                  targetPort: 3000
+      - name: Configure Container App Registry Access
+        run: |
+          az containerapp registry set \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --server ${{ env.ACR_NAME }}.azurecr.io \
+            --username ${{ env.ACR_NAME }} \
+            --password $(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv)
+
+      - name: Deploy to Azure Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          containerAppName: ${{ env.CONTAINER_APP_NAME }}
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          targetPort: 3000
