@@ -1,53 +1,47 @@
 # PlooiKaart
 
-A scoring system application.
+A scoring system application for the PlooiKaart group.
 
-## Setup
+## Quick Start
 
-1.  Install dependencies:
-
+1.  **Install dependencies**:
     ```bash
     npm install
     ```
 
-2.  Configure environment:
+2.  **Configure environment**:
+    Copy `.env.example` to `.env` and adjust settings if necessary.
+    ```bash
+    cp .env.example .env
+    ```
 
-    - Copy `.env.example` to `.env`.
-    - Update `MONGODB_URI` if needed.
+3.  **Start the app**:
+    ```bash
+    npm run dev:full
+    ```
 
-3.  Start MongoDB:
-    - Ensure you have a MongoDB instance running (e.g., via Docker or local installation).
-    - Connection string defaults to `mongodb://localhost:27017/plooikaart`.
-
-## Running
-
-Start both the backend server and the frontend client:
-
-```bash
-npm run dev:full
-```
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3000
+For detailed setup instructions, including database configuration and troubleshooting, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Features
 
-- **Login**: Use seeded users (e.g., `ewoud` / `password` - wait, password needs reset first).
-- **Password Reset**: Since seeded users have no password, go to "Forgot Password", enter username/email. In dev-mode, the reset link is logged to the server console. Click it to set a password.
-- **Dashboard**: View your score and the leaderboard.
-- **Meetings**: Register Thursday meetings, mark attendance, and add top-ups.
-- **Audit Trail**: View history of actions.
+- **Login**: Secure authentication with JWT.
+- **Password Reset**: Email-based (or console-logged in dev) password reset flow.
+- **Dashboard**: Real-time leaderboard and personal score tracking.
+- **Meetings**: Manage weekly meetings, attendance, and top-ups.
+- **Audit Trail**: Comprehensive log of all system actions.
+- **PWA**: Installable as a Progressive Web App.
 
-## Seeded Users
+## Contributing
 
-- Ewoud (`ewoud`)
-- Tom (`tom`)
-- Dave (`dave`)
-- Birger (`birger`) - Pilot (+5 points)
-- Bert (`bert`)
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to set up your development environment and submit pull requests.
 
 ## Tech Stack
 
-- **Frontend**: React, Vite, TypeScript
+- **Frontend**: React, Vite, TypeScript, Material UI
 - **Backend**: Node.js, Express, Mongoose, TypeScript
-- **Database**: MongoDB
+- **Database**: MongoDB (Cosmos DB in production)
+- **Deployment**: Azure Static Web Apps & Azure Container Apps
+
+## License
+
+[MIT](LICENSE)
