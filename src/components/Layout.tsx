@@ -1,9 +1,8 @@
-import { ContainerClient } from "@azure/storage-blob";
+import React, { useState } from "react";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AppBar, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField, Toolbar } from "@mui/material";
-import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -27,32 +26,19 @@ export default function Layout() {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setUploading(true);
     try {
-      const sasUrl = import.meta.env.VITE_AZURE_STORAGE_SAS_URL;
-      if (!sasUrl) throw new Error("Azure Storage SAS URL not found");
+      const form = new FormData();
+      form.append('file', file);
 
-      // Ensure the URL points to the container
-      const containerName = "plooiimages";
-      const urlObj = new URL(sasUrl);
-      if (!urlObj.pathname.includes(containerName)) {
-        urlObj.pathname = `/${containerName}`;
-      }
-
-      const containerClient = new ContainerClient(urlObj.toString());
-      const blobName = `${user?._id}-${Date.now()}-${file.name}`;
-      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-      await blockBlobClient.uploadData(file, {
-        blobHTTPHeaders: { blobContentType: file.type },
+      const res = await client.post('/upload/upload', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      const blobUrl = blockBlobClient.url.split("?")[0];
-      setEditProfilePicture(blobUrl);
+      setEditProfilePicture(res.data.url);
     } catch (error) {
-      console.error("Upload failed", error);
-      alert("Failed to upload image");
+      console.error('Upload failed', error);
+      alert('Failed to upload image');
     } finally {
       setUploading(false);
     }

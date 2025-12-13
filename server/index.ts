@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auditRoutes from './routes/audit';
+import uploadRoutes from './routes/upload';
 import authRoutes from './routes/auth';
 import meetingRoutes from './routes/meetings';
 import userRoutes from './routes/users';
@@ -54,6 +55,7 @@ app.use('/auth', authRoutes);
 app.use('/meetings', meetingRoutes);
 app.use('/audit', auditRoutes);
 app.use('/users', userRoutes); // For scores and me
+app.use('/upload', uploadRoutes);
 
 // Serve static files from the React app
 //app.use(express.static(path.join(__dirname, '../dist')));
