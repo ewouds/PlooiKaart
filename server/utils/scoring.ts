@@ -11,8 +11,7 @@ export async function calculateScores() {
     date: { $gte: startOfYear, $lte: endOfYear }
   });
 
-  console.log(`Calculating scores for ${users.length} users and ${meetings.length} meetings.`);
-
+  
   const scores = users.map(user => {
     let score = 5;
     if (user.isPilot) score += 5;
@@ -36,8 +35,6 @@ export async function calculateScores() {
 
     score = score + topUps - penalties;
     
-    console.log(`User: ${user.displayName}, Score: ${score} (Base: ${user.isPilot ? 10 : 5}, TopUps: ${topUps}, Penalties: ${penalties})`);
-
     return {
       ...user.toObject(),
       score,

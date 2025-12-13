@@ -35,13 +35,27 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    service: 'PlooiKaart Backend API',
+    status: 'healthy',
+    endpoints: {
+      auth: '/auth',
+      meetings: '/meetings',
+      audit: '/audit',
+      users: '/users'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/auth', authRoutes);
 app.use('/meetings', meetingRoutes);
 app.use('/audit', auditRoutes);
 app.use('/users', userRoutes); // For scores and me
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../dist')));
+//app.use(express.static(path.join(__dirname, '../dist')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
