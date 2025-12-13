@@ -26,12 +26,16 @@ router.post('/login', async (req, res) => {
   const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
   
   const isProduction = process.env.NODE_ENV === 'production';
-  res.cookie('token', token, { 
-    httpOnly: true, 
+  const cookieOptions: any = {
+    httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 day
     sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction
-  });
+    secure: isProduction,
+    path: '/'
+  };
+
+  console.log('[AUTH] Setting cookie with options:', { ...cookieOptions, isProduction, origin: req.headers.origin });
+  res.cookie('token', token, cookieOptions);
   res.json({ message: 'Logged in' });
 });
 
