@@ -87,7 +87,18 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req: any
       blobHTTPHeaders: { blobContentType: req.file.mimetype },
     });
 
-    const blobUrl = blockBlobClient.url;
+    // Return clean URL without SAS parameters (container is public)
+    // Parse the URL and strip query string if present (from old SAS-based clients)
+    let blobUrl = blockBlobClient.url;
+    try {
+      const urlObj = new URL(blobUrl);
+      // Remove query string to ensure clean public URL
+      blobUrl = `${urlObj.origin}${urlObj.pathname}`;
+    } catch (e) {
+      // Fallback: use URL as-is if parsing fails
+      console.warn('[UPLOAD] Could not parse blob URL, returning as-is:', e);
+    }
+
     res.json({ url: blobUrl });
   } catch (err) {
     console.error('Upload error', err);
