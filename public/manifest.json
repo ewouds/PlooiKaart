@@ -3,19 +3,21 @@
   "short_name": "PlooiKaart",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#f3f4f6",
+  "theme_color": "#2563eb",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/plooi_logo.png",
+      "src": "/plooi_logo_192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/plooi_logo.png",
+      "src": "/plooi_logo_512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
