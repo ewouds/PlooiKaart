@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build:client": "tsc && vite build",
+    "generate:version": "tsx scripts/generate-version.ts",
+    "build:client": "npm run generate:version && tsc && vite build",
     "build:server": "esbuild server/index.ts --bundle --platform=node --format=esm --outfile=dist-server/index.js --packages=external",
     "build": "npm run build:client && npm run build:server",
     "start": "node dist-server/index.js",

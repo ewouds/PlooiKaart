@@ -22,6 +22,7 @@ import { Link as RouterLink } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useThemeContext } from "../context/ThemeContext";
+import { APP_VERSION } from "../version";
 
 interface ScoreUser {
   _id: string;
@@ -172,7 +173,7 @@ export default function Dashboard() {
         )}
 
         <Typography variant='body2' color='text.secondary' align='center' sx={{ mt: 4, mb: 2 }}>
-          💩🧸🌳 ver. 20251213.1
+          💩🧸🌳 ver. {APP_VERSION}
         </Typography>
       </Container>
     </>

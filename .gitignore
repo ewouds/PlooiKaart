@@ -26,3 +26,8 @@ dist-server
 
 .env
 dist-server
+
+# Build version tracking
+.version.json
+src/version.ts
+server/version.ts

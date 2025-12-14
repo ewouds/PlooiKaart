@@ -11,6 +11,7 @@ import meetingRoutes from './routes/meetings';
 import uploadRoutes from './routes/upload';
 import userRoutes from './routes/users';
 import { seedUsers } from './seed';
+import { APP_VERSION } from './version';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
   res.json({
     service: 'PlooiKaart Backend API',
     status: 'healthy',
+    version: APP_VERSION,
     endpoints: {
       auth: '/auth',
       meetings: '/meetings',
