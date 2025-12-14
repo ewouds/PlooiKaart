@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 interface VersionData {
@@ -59,3 +59,4 @@ export const APP_VERSION = '${version}';
 writeFileSync(join(process.cwd(), 'server', 'version.ts'), serverVersionModule);
 
 export { version };
+

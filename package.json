@@ -9,9 +9,9 @@
   "scripts": {
     "dev": "vite",
     "generate:version": "tsx scripts/generate-version.ts",
-    "build:client": "npm run generate:version && tsc && vite build",
+    "build:client": "tsc && vite build",
     "build:server": "esbuild server/index.ts --bundle --platform=node --format=esm --outfile=dist-server/index.js --packages=external",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm run generate:version && npm run build:client && npm run build:server",
     "start": "node dist-server/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

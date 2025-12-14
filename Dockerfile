@@ -11,8 +11,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the server
-RUN npm run build:server
+# Build (generate version and build server)
+RUN npm run build
 
 # Remove devDependencies to keep image small
 RUN npm prune --production
