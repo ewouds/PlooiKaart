@@ -112,7 +112,7 @@ export default function Login() {
           </Box>
         </CardContent>
       </Card>
-      <Typography variant="caption" align="center" sx={{ mt: 2, color: 'text.secondary' }}>
+      <Typography variant='caption' align='center' sx={{ mt: 2, color: "text.secondary" }}>
         Versie: {APP_VERSION}
       </Typography>
     </Container>
