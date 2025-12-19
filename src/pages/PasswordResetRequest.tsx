@@ -11,9 +11,9 @@ export default function PasswordResetRequest() {
     e.preventDefault();
     try {
       const res = await client.post("/auth/password-reset/request", { identifier });
-      setMessage(res.data.message);
+      setMessage("Indien de gebruiker bestaat, is er een reset link verzonden.");
     } catch (err) {
-      setMessage("Something went wrong. Please try again.");
+      setMessage("Er is iets misgegaan. Probeer het opnieuw.");
     }
   };
 
@@ -22,7 +22,7 @@ export default function PasswordResetRequest() {
       <Card variant='outlined'>
         <CardContent>
           <Typography variant='h5' component='h1' gutterBottom align='center'>
-            Reset Password
+            Wachtwoord Resetten
           </Typography>
 
           {message ? (
@@ -32,11 +32,11 @@ export default function PasswordResetRequest() {
           ) : (
             <form onSubmit={handleSubmit}>
               <Typography variant='body2' color='text.secondary' gutterBottom align='center'>
-                Enter your username or email to receive a reset link.
+                Vul je gebruikersnaam of e-mailadres in om een reset-link te ontvangen.
               </Typography>
 
               <TextField
-                label='Username or Email'
+                label='Gebruikersnaam of E-mail'
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 fullWidth
@@ -45,14 +45,14 @@ export default function PasswordResetRequest() {
               />
 
               <Button type='submit' variant='contained' color='primary' fullWidth size='large' sx={{ mt: 2 }}>
-                Send Reset Link
+                Verstuur Reset Link
               </Button>
             </form>
           )}
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Button component={RouterLink} to='/login' color='primary'>
-              Back to Login
+              Terug naar Login
             </Button>
           </Box>
         </CardContent>

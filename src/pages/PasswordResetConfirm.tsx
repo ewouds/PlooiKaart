@@ -20,10 +20,10 @@ export default function PasswordResetConfirm() {
         token,
         newPassword,
       });
-      setMessage("Password updated successfully. You can now login.");
+      setMessage("Wachtwoord succesvol bijgewerkt. Je kan nu inloggen.");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err: any) {
-      setMessage(err.response?.data?.message || "Failed to reset password");
+      setMessage(err.response?.data?.message || "Wachtwoord resetten mislukt");
     }
   };
 
@@ -33,10 +33,10 @@ export default function PasswordResetConfirm() {
         <Card variant='outlined'>
           <CardContent sx={{ textAlign: "center" }}>
             <Alert severity='error' sx={{ mb: 2 }}>
-              Invalid reset link.
+              Ongeldige reset link.
             </Alert>
             <Button component={RouterLink} to='/login' variant='text'>
-              Back to Login
+              Terug naar Login
             </Button>
           </CardContent>
         </Card>
@@ -49,7 +49,7 @@ export default function PasswordResetConfirm() {
       <Card variant='outlined'>
         <CardContent>
           <Typography variant='h5' component='h1' gutterBottom align='center'>
-            Set New Password
+            Nieuw Wachtwoord Instellen
           </Typography>
 
           {message && (
@@ -60,7 +60,7 @@ export default function PasswordResetConfirm() {
 
           <form onSubmit={handleSubmit}>
             <TextField
-              label='New Password'
+              label='Nieuw Wachtwoord'
               type='password'
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -70,13 +70,13 @@ export default function PasswordResetConfirm() {
             />
 
             <Button type='submit' variant='contained' color='primary' fullWidth size='large' sx={{ mt: 2 }}>
-              Reset Password
+              Wachtwoord Resetten
             </Button>
           </form>
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Button component={RouterLink} to='/login' color='primary'>
-              Back to Login
+              Terug naar Login
             </Button>
           </Box>
         </CardContent>
