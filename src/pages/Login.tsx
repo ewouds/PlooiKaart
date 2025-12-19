@@ -36,9 +36,9 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await client.post("/auth/login", { username, password });
-      const res = await client.get("/users/me");
-      login(res.data);
+      const res = await client.post("/auth/login", { username, password });
+      const { token, user } = res.data;
+      login(user, token);
       navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.message || "Toegang geweigerd");

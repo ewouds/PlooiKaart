@@ -13,7 +13,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: User, token?: string) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -25,16 +25,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     client
       .get("/users/me")
       .then((res) => setUser(res.data))
-      .catch(() => setUser(null))
+      .catch(() => {
+        localStorage.removeItem("token");
+        setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  const login = (userData: User) => setUser(userData);
+  const login = (userData: User, token?: string) => {
+    if (token) localStorage.setItem("token", token);
+    setUser(userData);
+  };
+
   const logout = async () => {
-    await client.post("/auth/logout");
+    try {
+      await client.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+    localStorage.removeItem("token");
     setUser(null);
   };
 

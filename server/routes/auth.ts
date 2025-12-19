@@ -36,7 +36,19 @@ router.post('/login', async (req, res) => {
 
   console.log('[AUTH] Setting cookie with options:', { ...cookieOptions, isProduction, origin: req.headers.origin });
   res.cookie('token', token, cookieOptions);
-  res.json({ message: 'Logged in' });
+  res.json({ 
+    message: 'Logged in', 
+    token, 
+    user: { 
+      _id: user._id, 
+      username: user.username, 
+      displayName: user.displayName, 
+      email: user.email,
+      isPilot: user.isPilot, 
+      profilePicture: user.profilePicture, 
+      theme: user.theme 
+    } 
+  });
 });
 
 router.post('/logout', (req, res) => {

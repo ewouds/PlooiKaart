@@ -6,11 +6,18 @@ export interface AuthRequest extends Request {
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
-  console.log('[AUTH] Cookies received:', Object.keys(req.cookies), 'from origin:', req.headers.origin);
+  let token = req.cookies.token;
+
+  // Check Authorization header
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  }
+
+  console.log('[AUTH] Token source:', authHeader ? 'Header' : (token ? 'Cookie' : 'None'));
 
   if (!token) {
-    console.log('[AUTH] No token cookie found - unauthorized');
+    console.log('[AUTH] No token found - unauthorized');
     return res.sendStatus(401);
   }
 
