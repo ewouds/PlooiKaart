@@ -15,12 +15,14 @@ router.post('/login', async (req, res) => {
   const user = await User.findOne({ username });
 
   if (!user || !user.passwordHash) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({
+      message: 'De verstrekte gebruikersnaam- en/of wachtwoordgegevens zijn onjuist.'
+    });
   }
 
   const validPassword = await bcrypt.compare(password, user.passwordHash);
   if (!validPassword) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ message: 'De verstrekte gebruikersnaam- en/of wachtwoordgegevens zijn onjuist.' });
   }
 
   const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
