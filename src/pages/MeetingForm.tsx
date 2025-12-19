@@ -129,14 +129,14 @@ export default function MeetingForm() {
     const presentSet = new Set(presentIds);
     for (const id of excusedIds) {
       if (presentSet.has(id)) {
-        setError("Een heerschap kan niet tegelijkertijd aanwezig en verontschuldigd zijn.");
+        setError("Een heerschap kan niet tegelijkertijd present en gedispenseerd zijn.");
         return;
       }
     }
 
     for (const t of topUps) {
       if (t.amount <= 0 || t.amount % 5 !== 0) {
-        setError("De bijkoop dient een veelvoud van vijf te bedragen.");
+        setError("De acquisitie dient een veelvoud van vijf te bedragen.");
         return;
       }
     }
@@ -153,7 +153,7 @@ export default function MeetingForm() {
       if (err.response?.status === 409 && err.response?.data?.code === "MEETING_EXISTS") {
         setOpenConfirm(true);
       } else {
-        setError(err.response?.data?.message || "Het indienen der vergadering is mislukt.");
+        setError(err.response?.data?.message || "De ratificatie der notulen is mislukt.");
       }
     }
   };
@@ -170,7 +170,7 @@ export default function MeetingForm() {
       setOpenConfirm(false);
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Het overschrijven der samenkomst is mislukt.");
+      setError(err.response?.data?.message || "De herziening der notulen is mislukt.");
       setOpenConfirm(false);
     }
   };
@@ -182,7 +182,7 @@ export default function MeetingForm() {
       </Button>
 
       <Typography variant='h4' gutterBottom>
-        Samenkomst
+        Vergadering der Leden
       </Typography>
 
       {error && (
@@ -196,7 +196,7 @@ export default function MeetingForm() {
           <CardContent>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label='Datum der Samenkomst'
+                label='Datum der Zitting'
                 value={date}
                 onChange={(newValue) => setDate(newValue)}
                 slotProps={{ textField: { fullWidth: true, required: true } }}
@@ -208,7 +208,7 @@ export default function MeetingForm() {
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Aanwezigen
+              Presentielijst
             </Typography>
             <Stack spacing={2}>
               {users.map((u) => {
@@ -231,10 +231,10 @@ export default function MeetingForm() {
                     </Box>
                     <ToggleButtonGroup value={status} exclusive onChange={(_, newStatus) => handleAttendanceChange(u._id, newStatus)} size='small'>
                       <ToggleButton value='present' color='success' sx={{ px: 2 }}>
-                        <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} /> Aanwezig
+                        <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} /> Present
                       </ToggleButton>
                       <ToggleButton value='excused' color='warning' sx={{ px: 2 }}>
-                        <HelpOutlineIcon fontSize='small' sx={{ mr: 1 }} /> Ziek
+                        <HelpOutlineIcon fontSize='small' sx={{ mr: 1 }} /> Gerechtvaardigd
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Box>
@@ -247,14 +247,14 @@ export default function MeetingForm() {
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Bijkoop (5 Plooikaarten)
+              Acquisitie van Extra Plooikaarten
             </Typography>
 
             {topUps.map((t, i) => (
               <Box key={i} sx={{ p: 2, bgcolor: "background.default", borderRadius: 2, mb: 2, border: "1px solid", borderColor: "divider" }}>
                 <FormControl fullWidth margin='normal'>
-                  <InputLabel>Heerschap</InputLabel>
-                  <Select value={t.userId} label='Heerschap' onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
+                  <InputLabel>Betreffende Heer</InputLabel>
+                  <Select value={t.userId} label='Betreffende Heer' onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
                     {users.map((u) => (
                       <MenuItem key={u._id} value={u._id}>
                         {u.displayName}
@@ -264,28 +264,28 @@ export default function MeetingForm() {
                 </FormControl>
 
                 <TextField
-                  label='Toelichting'
+                  label='Memorie van Toelichting'
                   value={t.comment}
                   onChange={(e) => updateTopUp(i, "comment", e.target.value)}
-                  placeholder='Reden (bv. Rondje voor de ganse groep)'
+                  placeholder='Motivering (bv. Schenking van gerstenat aan het collectief)'
                   fullWidth
                   margin='normal'
                 />
 
                 <Button variant='outlined' color='error' startIcon={<DeleteIcon />} onClick={() => removeTopUp(i)} fullWidth sx={{ mt: 1 }}>
-                  Verwijderen
+                  Royeren
                 </Button>
               </Box>
             ))}
 
             <Button variant='outlined' startIcon={<AddIcon />} onClick={addTopUp} fullWidth>
-              Bijkoop toevoegen
+              Transactie Toevoegen
             </Button>
           </CardContent>
         </Card>
 
         <Button type='submit' variant='contained' size='large' fullWidth>
-          Samenkomst indienen
+          Notulen Ratificeren
         </Button>
       </form>
 
@@ -295,17 +295,16 @@ export default function MeetingForm() {
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id='alert-dialog-title'>{"Reeds Bestaande Zitting"}</DialogTitle>
+        <DialogTitle id='alert-dialog-title'>{"Conflict in de Annalen"}</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            Voorwaar, er is reeds een samenkomst geboekstaafd op deze datum. Wenst gij de bestaande notulen te overschrijven met de onderhavige
-            gegevens?
+            Voorwaar, er is reeds een zitting geboekstaafd op deze datum. Wenst gij de bestaande notulen te herzien met de onderhavige gegevens?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenConfirm(false)}>Afzien</Button>
+          <Button onClick={() => setOpenConfirm(false)}>Staken</Button>
           <Button onClick={handleConfirmOverwrite} autoFocus color='error'>
-            Overschrijven
+            Herzien
           </Button>
         </DialogActions>
       </Dialog>

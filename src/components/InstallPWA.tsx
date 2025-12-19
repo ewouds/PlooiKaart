@@ -57,12 +57,12 @@ export const InstallPWA: React.FC = () => {
     <Snackbar
       open={open}
       onClose={handleClose}
-      message='Install PlooiKaart for a better experience'
+      message='Installeer de PlooiKaart Applicatie voor een optimale beleving van het reglement'
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       action={
         <React.Fragment>
           <Button color='primary' size='small' onClick={handleInstallClick} startIcon={<DownloadIcon />}>
-            Install
+            Installeer
           </Button>
           <IconButton size='small' aria-label='close' color='inherit' onClick={handleClose}>
             <CloseIcon fontSize='small' />

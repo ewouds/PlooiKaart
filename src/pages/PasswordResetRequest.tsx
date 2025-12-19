@@ -11,7 +11,7 @@ export default function PasswordResetRequest() {
     e.preventDefault();
     try {
       const res = await client.post("/auth/password-reset/request", { identifier });
-      setMessage("Indien de identiteit van de verzoeker in de archieven wordt aangetroffen, is een digitaal hersteldecreet per elektronische post verzonden.");
+      setMessage(res.data.message);
     } catch (err) {
       setMessage("Er heeft zich een procedurele dwaling voorgedaan. Gelieve het verzoek opnieuw in te dienen.");
     }

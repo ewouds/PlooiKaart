@@ -41,7 +41,7 @@ export default function Login() {
       login(user, token);
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Toegang geweigerd");
+      setError(err.response?.data?.message || "De toegang is u ontzegd.");
     }
   };
 
@@ -68,7 +68,7 @@ export default function Login() {
           <form onSubmit={handleSubmit}>
             <TextField
               select
-              label='Naam des Heeren'
+              label='Naam'
               value={username}
               onChange={handleUsernameChange}
               required

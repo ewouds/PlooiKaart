@@ -30,13 +30,14 @@ export async function sendPasswordResetEmail(to: string, resetLink: string) {
   const info = await getTransporter().sendMail({
     from: `"PlooiKaart" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
     to,
-    subject: 'Password Reset Request',
-    text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+    subject: 'Petitie tot Herziening van de Toegangscode',
+    text: `Geachte betrokkene,\n\nEr is heden een verzoekschrift ingediend strekkende tot het herstellen van uw toegangscode tot de Plooikaarten-app. Gelieve de onderstaande digitale verwijzing te activeren teneinde de herstelprocedure te effectueren:\n\n${resetLink}\n\nIndien dit verzoekschrift niet door uwe persoone is ingediend, gelieve deze digitale missive als nietig te beschouwen en te vernietigen.`,
     html: `
-      <p>You requested a password reset.</p>
-      <p>Click the link below to reset your password:</p>
+      <p>Geachte betrokkene,</p>
+      <p>Er is heden een verzoekschrift ingediend strekkende tot het herstellen van uw toegangscode tot de Plooikaarten-app.</p>
+      <p>Gelieve de onderstaande digitale verwijzing te activeren teneinde de herstelprocedure te effectueren:</p>
       <a href="${resetLink}">${resetLink}</a>
-      <p>If you did not request this, please ignore this email.</p>
+      <p>Indien dit verzoekschrift niet door uwe persoone is ingediend, gelieve deze digitale missive als nietig te beschouwen en te vernietigen.</p>
     `,
   });
 

@@ -108,13 +108,13 @@ export default function AuditTrail() {
           {topUps && topUps.length > 0 && (
             <Box sx={{ mt: 1 }}>
               <Typography variant='body2' fontWeight='bold'>
-                Top-Ups:
+                Bijkoop:
               </Typography>
               <List dense disablePadding>
                 {topUps.map((t: any, i: number) => (
                   <ListItem key={i} disablePadding>
                     <ListItemText
-                      primary={`User ${getUserName(t.userId)}: +${t.amount}`}
+                      primary={`Heer ${getUserName(t.userId)}: +${t.amount}`}
                       secondary={t.comment ? `(${t.comment})` : null}
                       primaryTypographyProps={{ variant: "body2" }}
                       secondaryTypographyProps={{ variant: "caption" }}
@@ -128,10 +128,10 @@ export default function AuditTrail() {
       );
     }
     if (event.type === "PASSWORD_RESET_REQUESTED") {
-      return <Typography variant='body2'>Requested password reset for {event.data?.email}</Typography>;
+      return <Typography variant='body2'>Verzoek tot herstel van toegangscredentials voor {event.data?.email}</Typography>;
     }
     if (event.type === "PASSWORD_RESET_COMPLETED") {
-      return <Typography variant='body2'>Password reset completed</Typography>;
+      return <Typography variant='body2'>Herstel van toegangscredentials voltooid</Typography>;
     }
     return (
       <Box component='pre' sx={{ p: 1, bgcolor: "grey.100", borderRadius: 1, overflowX: "auto", fontSize: "0.75rem", m: 0 }}>
@@ -154,15 +154,15 @@ export default function AuditTrail() {
         <CardContent>
           <Stack direction='row' alignItems='center' gap={1} mb={2}>
             <FilterListIcon color='primary' />
-            <Typography variant='h6'>Filters</Typography>
+            <Typography variant='h6'>Selectiecriteria</Typography>
           </Stack>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <FormControl fullWidth size='small'>
-                  <InputLabel>Gebruiker</InputLabel>
+                  <InputLabel>Betrokkene</InputLabel>
                   <Select value={filterUserId} label='Filter by User' onChange={(e) => setFilterUserId(e.target.value)}>
-                    <MenuItem value='ALL'>Alle Gebruikers</MenuItem>
+                    <MenuItem value='ALL'>Allen</MenuItem>
                     {users.map((u) => (
                       <MenuItem key={u._id} value={u._id}>
                         {u.displayName}
@@ -173,11 +173,11 @@ export default function AuditTrail() {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <FormControl fullWidth size='small'>
-                  <InputLabel>Type Gebeurtenis</InputLabel>
+                  <InputLabel>Aard der Handeling</InputLabel>
                   <Select value={filterType} label='Event Type' onChange={(e) => setFilterType(e.target.value)}>
                     {uniqueTypes.map((type) => (
                       <MenuItem key={type} value={type}>
-                        {type === "ALL" ? "Alle Types" : type.replace(/_/g, " ")}
+                        {type === "ALL" ? "Alle Categorieën" : type.replace(/_/g, " ")}
                       </MenuItem>
                     ))}
                   </Select>
@@ -186,7 +186,7 @@ export default function AuditTrail() {
               <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                 <DateRangePicker
                   slots={{ field: SingleInputDateRangeField }}
-                  label='Datumbereik'
+                  label='Temporeel Kader'
                   value={dateRange}
                   onChange={(newValue) => setDateRange(newValue)}
                   slotProps={{ textField: { size: "small", fullWidth: true } }}
@@ -219,7 +219,7 @@ export default function AuditTrail() {
                   ) : (
                     <PersonIcon fontSize='small' color='action' />
                   )}
-                  <Typography variant='body2'>{e.actorUserId?.displayName || "System"}</Typography>
+                  <Typography variant='body2'>{e.actorUserId?.displayName || "Het Systeem"}</Typography>
                 </Box>
 
                 <Divider sx={{ my: 1 }} />

@@ -93,11 +93,11 @@ export default function Layout() {
           },
         }}
       >
-        <DialogTitle>Profiel Bijwerken</DialogTitle>
+        <DialogTitle>Actualisatie der Persoonsgegevens</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <Button variant='contained' component='label' disabled={uploading}>
-              {uploading ? "Bezig met uploaden..." : "Beeltenis Uploaden"}
+              {uploading ? "De beeltenis wordt thans overgedragen..." : "Deponeer een Beeltenis"}
               <input type='file' hidden accept='image/*' onChange={handleFileUpload} />
             </Button>
           </Box>
