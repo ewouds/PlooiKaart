@@ -30,7 +30,6 @@
     "@types/react-date-range": "^1.4.10",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",

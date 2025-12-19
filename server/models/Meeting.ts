@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const meetingSchema = new mongoose.Schema({
-  date: { type: String, required: true, unique: true }, // YYYY-MM-DD
+  date: { type: String, required: true, unique: true }, // DD-MM-YYYY
   presentUserIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   excusedUserIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   topUps: [{

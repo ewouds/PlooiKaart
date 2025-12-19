@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   Card,
@@ -17,8 +18,12 @@ import {
 } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import { useEffect, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useThemeContext } from "../context/ThemeContext";
@@ -41,15 +46,37 @@ interface HistoryPoint {
   }[];
 }
 
+function ServerDay(props: PickersDayProps & { highlightedDays?: string[] }) {
+  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
+
+  const isSelected = !props.outsideCurrentMonth && highlightedDays.includes(props.day.format("YYYY-MM-DD"));
+
+  return (
+    <Badge key={props.day.toString()} overlap='circular' badgeContent={isSelected ? "🍺" : undefined}>
+      <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
+    </Badge>
+  );
+}
+
 export default function Dashboard() {
   const theme = useTheme();
   const { user } = useAuth();
   const { mode } = useThemeContext();
   const [scores, setScores] = useState<ScoreUser[]>([]);
   const [history, setHistory] = useState<HistoryPoint[]>([]);
+  const [meetingDates, setMeetingDates] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     client.get("/users/scores").then((res) => setScores(res.data));
+    client.get("/meetings").then((res) => {
+      if (Array.isArray(res.data)) {
+        const dates = res.data.map((m: any) => m.date);
+        setMeetingDates(dates);
+      } else {
+        console.warn("Received invalid meetings data (likely server not updated):", res.data);
+      }
+    });
     client
       .get("/users/scores/history")
       .then((res) => {
@@ -100,7 +127,7 @@ export default function Dashboard() {
             Logboek
           </Button>
           <Button component={RouterLink} to='/reglement' variant='outlined'>
-            Reglement
+            Codex
           </Button>
         </Stack>
 
@@ -153,6 +180,29 @@ export default function Dashboard() {
                 </div>
               ))}
             </List>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ mb: 4, border: 1, borderColor: "primary.main" }}>
+          <CardHeader title='Agenda der Samenkomsten' titleTypographyProps={{ align: "center", variant: "h6" }} />
+          <CardContent sx={{ display: "flex", justifyContent: "center" }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateCalendar
+                slots={{
+                  day: ServerDay,
+                }}
+                slotProps={{
+                  day: {
+                    highlightedDays: meetingDates,
+                  } as any,
+                }}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    navigate(`/meetings/new?date=${newValue.format("YYYY-MM-DD")}`);
+                  }
+                }}
+              />
+            </LocalizationProvider>
           </CardContent>
         </Card>
 

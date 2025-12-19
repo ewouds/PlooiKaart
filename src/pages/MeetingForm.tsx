@@ -197,9 +197,10 @@ export default function MeetingForm() {
           <CardContent>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label='Datum der Zitting'
+                label='Datum'
                 value={date}
                 onChange={(newValue) => setDate(newValue)}
+                format='DD-MM-YYYY'
                 slotProps={{ textField: { fullWidth: true, required: true } }}
               />
             </LocalizationProvider>

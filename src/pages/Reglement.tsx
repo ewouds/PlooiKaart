@@ -61,7 +61,8 @@ export default function Reglement() {
               3.1. Een plooikaart wordt geacht rechtsgeldig “gesmeten” zodra een quorum van twee (2) heren is bereikt.
             </Typography>
             <Typography paragraph>
-              3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele samenkomst bevestigen.
+              3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele samenkomst present tekenen op de afgesproken
+              locatie.
             </Typography>
           </Box>
 
@@ -124,6 +125,26 @@ export default function Reglement() {
             <Typography paragraph>
               7.2. Deze termen worden, zonder uitzondering, geacht te verwijzen naar ieder lid, deelnemer of aanwezig wezen, ongeacht
               genderidentiteit, -expressie, -beleving of enige andere persoonskenmerk dat juridisch of maatschappelijk relevant zou kunnen zijn.
+            </Typography>
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box>
+            <Typography variant='h6' gutterBottom color='primary'>
+              Artikel 8: Statutaire Wijzigingen
+            </Typography>
+            <Typography paragraph>
+              8.1. Met ingang van 1 januari 2026 zijn wijzigingen aan deze statuten slechts mogelijk na uitdrukkelijke ratificatie door een
+              gekwalificeerde meerderheid van vier vijfde (4/5) der stemgerechtigde leden.
+            </Typography>
+            <Typography paragraph>
+              8.2. De stemming kan zowel in fysieke aanwezigheid als via digitale weg geschieden, mits de authenticiteit van de stem onomstotelijk
+              vaststaat.
+            </Typography>
+            <Typography paragraph>
+              8.3. Een statutaire wijziging treedt pas in werking op het moment van officiële publicatie in de Plooikaart-applicatie, dewelke fungeert
+              als de enige en absolute bron van waarheid (<i>single source of truth</i>).
             </Typography>
           </Box>
         </CardContent>
