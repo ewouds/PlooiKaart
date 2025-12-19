@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { APP_VERSION } from "../version";
 
 interface LoginUser {
   displayName: string;
@@ -111,6 +112,9 @@ export default function Login() {
           </Box>
         </CardContent>
       </Card>
+      <Typography variant="caption" align="center" sx={{ mt: 2, color: 'text.secondary' }}>
+        Versie: {APP_VERSION}
+      </Typography>
     </Container>
   );
 }
