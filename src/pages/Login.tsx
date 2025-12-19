@@ -48,7 +48,7 @@ export default function Login() {
   return (
     <Container maxWidth='xs' sx={{ display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "100vh" }}>
       <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-        <Box component="img" src='/plooi_logo.png' alt='PlooiKaart Logo' sx={{ width: 180, height: 180, objectFit: "contain" }} />
+        <Box component='img' src='/plooi_logo.png' alt='PlooiKaart Logo' sx={{ width: 180, height: 180, objectFit: "contain" }} />
       </Box>
       <Card>
         <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

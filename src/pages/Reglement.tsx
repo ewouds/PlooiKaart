@@ -93,7 +93,7 @@ export default function Reglement() {
 
           <Divider sx={{ my: 3 }} />
 
-          <Box>
+          <Box sx={{ mb: 3 }}>
             <Typography variant='h6' gutterBottom color='primary'>
               Artikel 6: Gerechtvaardigde afwezigheid
             </Typography>
@@ -101,11 +101,29 @@ export default function Reglement() {
               6.1. Een afwezigheid wordt uitsluitend als gerechtvaardigd erkend indien de heer in kwestie een geldig doktersattest kan voorleggen.
             </Typography>
             <Typography paragraph>
-              6.2. Indien een heer op de vaste donderdagvergadering niet fysiek aanwezig is om 22:00 uur, wordt hij automatisch en onherroepelijk als
-              “geplooid” beschouwd, behoudens het in Artikel 6.1 vermelde doktersattest.
+              6.2. Indien een heer op de vaste samenkomst niet fysiek en lijfelijk aanwezig is om 22:00 uur, zijnde Midden-Europese Tijd (CET/CEST),
+              zoals van toepassing op het Belgisch grondgebied, wordt hij van rechtswege, automatisch en onherroepelijk als “geplooid” beschouwd,
+              behoudens het in Artikel 6.1 vermelde geldige doktersattest.
             </Typography>
             <Typography paragraph>
               6.3. Een niet-gerechtvaardigde afwezigheid leidt onvermijdelijk tot verlies van een plooikaart, conform Artikel 3.3.
+            </Typography>
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box>
+            <Typography variant='h6' gutterBottom color='primary'>
+              Artikel 7: Genderneutrale interpretatie
+            </Typography>
+            <Typography paragraph>
+              7.1. Waar in dit reglement gebruik wordt gemaakt van de termen “de heer”, “heren” of aanverwante mannelijk grammaticale constructies,
+              dienen deze uitsluitend te worden begrepen als stilistische, historisch-culturele en taalkundige conventies, zonder enige intentie tot
+              uitsluiting.
+            </Typography>
+            <Typography paragraph>
+              7.2. Deze termen worden, zonder uitzondering, geacht te verwijzen naar ieder lid, deelnemer of aanwezig wezen, ongeacht
+              genderidentiteit, -expressie, -beleving of enige andere persoonskenmerk dat juridisch of maatschappelijk relevant zou kunnen zijn.
             </Typography>
           </Box>
         </CardContent>
