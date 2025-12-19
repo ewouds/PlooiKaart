@@ -11,9 +11,9 @@ export default function PasswordResetRequest() {
     e.preventDefault();
     try {
       const res = await client.post("/auth/password-reset/request", { identifier });
-      setMessage("Indien de gebruiker bestaat, is er een reset link verzonden.");
+      setMessage("Indien de identiteit van de verzoeker in de archieven wordt aangetroffen, is een digitaal hersteldecreet per elektronische post verzonden.");
     } catch (err) {
-      setMessage("Er is iets misgegaan. Probeer het opnieuw.");
+      setMessage("Er heeft zich een procedurele dwaling voorgedaan. Gelieve het verzoek opnieuw in te dienen.");
     }
   };
 
@@ -22,7 +22,7 @@ export default function PasswordResetRequest() {
       <Card variant='outlined'>
         <CardContent>
           <Typography variant='h5' component='h1' gutterBottom align='center'>
-            Wachtwoord Resetten
+            Herstelprocedure Toegangscredentials
           </Typography>
 
           {message ? (
@@ -32,11 +32,11 @@ export default function PasswordResetRequest() {
           ) : (
             <form onSubmit={handleSubmit}>
               <Typography variant='body2' color='text.secondary' gutterBottom align='center'>
-                Vul je gebruikersnaam of e-mailadres in om een reset-link te ontvangen.
+                Gelieve uw unieke identificatiekenmerk of elektronisch postadres te deponeren teneinde een herstelprocedure te initiëren.
               </Typography>
 
               <TextField
-                label='Gebruikersnaam of E-mail'
+                label='Identificatiekenmerk of E-mailadres'
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 fullWidth
@@ -45,14 +45,14 @@ export default function PasswordResetRequest() {
               />
 
               <Button type='submit' variant='contained' color='primary' fullWidth size='large' sx={{ mt: 2 }}>
-                Verstuur Reset Link
+                Verzend Hersteldecreet
               </Button>
             </form>
           )}
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Button component={RouterLink} to='/login' color='primary'>
-              Terug naar Login
+              Terugkeer naar het Inlogportaal
             </Button>
           </Box>
         </CardContent>

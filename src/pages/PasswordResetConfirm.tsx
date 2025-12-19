@@ -20,10 +20,10 @@ export default function PasswordResetConfirm() {
         token,
         newPassword,
       });
-      setMessage("Wachtwoord succesvol bijgewerkt. Je kan nu inloggen.");
+      setMessage("De wijziging der toegangscredentials is succesvol geratificeerd. U bent wederom gerechtigd tot toegang.");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err: any) {
-      setMessage(err.response?.data?.message || "Wachtwoord resetten mislukt");
+      setMessage(err.response?.data?.message || "De ratificatie van het nieuwe wachtwoord is mislukt");
     }
   };
 
@@ -33,10 +33,10 @@ export default function PasswordResetConfirm() {
         <Card variant='outlined'>
           <CardContent sx={{ textAlign: "center" }}>
             <Alert severity='error' sx={{ mb: 2 }}>
-              Ongeldige reset link.
+              Het aangeboden hersteldecreet is ongeldig of verlopen.
             </Alert>
             <Button component={RouterLink} to='/login' variant='text'>
-              Terug naar Login
+              Terugkeer naar het Inlogportaal
             </Button>
           </CardContent>
         </Card>
@@ -49,7 +49,7 @@ export default function PasswordResetConfirm() {
       <Card variant='outlined'>
         <CardContent>
           <Typography variant='h5' component='h1' gutterBottom align='center'>
-            Nieuw Wachtwoord Instellen
+            Ratificatie Nieuw Wachtwoord
           </Typography>
 
           {message && (
@@ -60,7 +60,7 @@ export default function PasswordResetConfirm() {
 
           <form onSubmit={handleSubmit}>
             <TextField
-              label='Nieuw Wachtwoord'
+              label='Nieuw Geheim Wachtwoord'
               type='password'
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -70,13 +70,13 @@ export default function PasswordResetConfirm() {
             />
 
             <Button type='submit' variant='contained' color='primary' fullWidth size='large' sx={{ mt: 2 }}>
-              Wachtwoord Resetten
+              Bekrachtig Nieuw Wachtwoord
             </Button>
           </form>
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Button component={RouterLink} to='/login' color='primary'>
-              Terug naar Login
+              Terugkeer naar het Inlogportaal
             </Button>
           </Box>
         </CardContent>
