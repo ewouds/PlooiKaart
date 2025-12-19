@@ -6,7 +6,7 @@ export interface AuthRequest extends Request {
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  let token = req.cookies.token;
+  let token = undefined;
 
   // Check Authorization header
   const authHeader = req.headers['authorization'];
@@ -14,7 +14,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     token = authHeader.split(' ')[1];
   }
 
-  console.log('[AUTH] Token source:', authHeader ? 'Header' : (token ? 'Cookie' : 'None'));
+  console.log('[AUTH] Token source:', authHeader ? 'Header' : 'None');
 
   if (!token) {
     console.log('[AUTH] No token found - unauthorized');

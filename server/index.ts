@@ -1,4 +1,3 @@
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -32,10 +31,8 @@ console.log('Allowed CORS origins:', allowedOrigins);
 
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true,
 }));
 app.use(express.json());
-app.use(cookieParser());
 
 // Routes
 app.get('/', (req, res) => {

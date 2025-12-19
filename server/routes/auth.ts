@@ -25,17 +25,6 @@ router.post('/login', async (req, res) => {
 
   const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
   
-  const isProduction = process.env.NODE_ENV === 'production';
-  const cookieOptions: any = {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-    sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction,
-    path: '/'
-  };
-
-  console.log('[AUTH] Setting cookie with options:', { ...cookieOptions, isProduction, origin: req.headers.origin });
-  res.cookie('token', token, cookieOptions);
   res.json({ 
     message: 'Logged in', 
     token, 
@@ -52,7 +41,6 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('token');
   res.json({ message: 'Logged out' });
 });
 
