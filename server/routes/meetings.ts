@@ -6,6 +6,11 @@ import { User } from '../models/User';
 
 const router = express.Router();
 
+router.get('/', authenticateToken, async (req, res) => {
+  const meetings = await Meeting.find({}, 'date');
+  res.json(meetings);
+});
+
 router.get('/:date', authenticateToken, async (req, res) => {
   const { date } = req.params;
   const meeting = await Meeting.findOne({ date });

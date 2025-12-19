@@ -29,13 +29,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useMemo, useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import client from "../api/client";
 import { AuditEvent, User } from "../shared/types";
 
 export default function AuditTrail() {
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
 
   // Filter states
   const [filterUserId, setFilterUserId] = useState("ALL");
@@ -202,12 +203,24 @@ export default function AuditTrail() {
       ) : (
         <Stack spacing={2}>
           {filteredEvents.map((e) => (
-            <Card key={e._id} variant='outlined'>
+            <Card
+              key={e._id}
+              variant='outlined'
+              sx={{
+                cursor: e.type === "MEETING_SUBMITTED" || e.type === "MEETING_OVERWRITTEN" ? "pointer" : "default",
+                "&:hover": e.type === "MEETING_SUBMITTED" || e.type === "MEETING_OVERWRITTEN" ? { bgcolor: "action.hover" } : {},
+              }}
+              onClick={() => {
+                if (e.type === "MEETING_SUBMITTED" || e.type === "MEETING_OVERWRITTEN") {
+                  navigate(`/meetings/new?date=${e.data.meetingDate}`);
+                }
+              }}
+            >
               <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
                   <Chip label={e.type.replace(/_/g, " ")} color='primary' size='small' variant='outlined' sx={{ fontWeight: "bold" }} />
                   <Typography variant='caption' color='text.secondary'>
-                    {new Date(e.timestamp).toLocaleString()}
+                    {dayjs(e.timestamp).format("DD/MM/YYYY HH:mm")}
                   </Typography>
                 </Box>
 

@@ -31,7 +31,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import client from "../api/client";
 
 interface User {
@@ -48,7 +48,8 @@ interface TopUp {
 
 export default function MeetingForm() {
   const [users, setUsers] = useState<User[]>([]);
-  const [date, setDate] = useState<Dayjs | null>(dayjs());
+  const [searchParams] = useSearchParams();
+  const [date, setDate] = useState<Dayjs | null>(searchParams.get("date") ? dayjs(searchParams.get("date")) : dayjs());
   const [presentIds, setPresentIds] = useState<string[]>([]);
   const [excusedIds, setExcusedIds] = useState<string[]>([]);
   const [topUps, setTopUps] = useState<TopUp[]>([]);
@@ -182,7 +183,7 @@ export default function MeetingForm() {
       </Button>
 
       <Typography variant='h4' gutterBottom>
-        Vergadering der Leden
+        samenkomst der Leden
       </Typography>
 
       {error && (

@@ -61,7 +61,7 @@ export default function Reglement() {
               3.1. Een plooikaart wordt geacht rechtsgeldig “gesmeten” zodra een quorum van twee (2) heren is bereikt.
             </Typography>
             <Typography paragraph>
-              3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele donderdagvergadering bevestigen.
+              3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele samenkomst bevestigen.
             </Typography>
           </Box>
 
@@ -83,7 +83,7 @@ export default function Reglement() {
             </Typography>
             <Typography paragraph>
               5.1. De eerste bijkoop wordt geacht rechtsgeldig voltooid wanneer de koper een rondje verstrekt en zich hoffelijk vergewist van de
-              dorstbehoeften der op donderdag aanwezige heren.
+              dorstbehoeften der aanwezige heren.
             </Typography>
             <Typography paragraph>
               5.2. Bij iedere daaropvolgende bijkoop wordt de verschuldigde tegenprestatie verhoogd tot het aanleveren van passende versnaperingen,
