@@ -15,7 +15,7 @@ _Goedgekeurd bij meerderheid der aanwezige heerschappen_
 ## Artikel 3: Voorwaarden tot het werpen der plooikaart
 
 3.1. Een plooikaart wordt geacht rechtsgeldig “gesmeten” zodra een quorum van twee (2) heren is bereikt.  
-3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele donderdagvergadering bevestigen.
+3.2. Dit quorum wordt gevormd wanneer minstens twee leden een afspraak op de traditionele vergadering bevestigen.
 
 ## Artikel 4: Bijkoop der plooikaarten
 
@@ -24,11 +24,11 @@ _Goedgekeurd bij meerderheid der aanwezige heerschappen_
 
 ## Artikel 5: Kostprijs van de bijkoop
 
-5.1. De eerste bijkoop wordt geacht rechtsgeldig voltooid wanneer de koper een rondje verstrekt en zich hoffelijk vergewist van de dorstbehoeften der op donderdag aanwezige heren.  
+5.1. De eerste bijkoop wordt geacht rechtsgeldig voltooid wanneer de koper een rondje verstrekt en zich hoffelijk vergewist van de dorstbehoeften der aanwezige heren.  
 5.2. Bij iedere daaropvolgende bijkoop wordt de verschuldigde tegenprestatie verhoogd tot het aanleveren van passende versnaperingen, ter ondersteuning van het genot der drank.
 
 ## Artikel 6: Gerechtvaardigde afwezigheid
 
-6.1. Een afwezigheid wordt uitsluitend als gerechtvaardigd erkend indien de heer in kwestie een geldig doktersattest kan voorleggen.  
-6.2. Indien een heer op de vaste donderdagvergadering niet fysiek aanwezig is om 22:00 uur, wordt hij automatisch en onherroepelijk als “geplooid” beschouwd, behoudens het in Artikel 6.1 vermelde doktersattest.  
-6.3. Een niet-gerechtvaardigde afwezigheid leidt onvermijdelijk tot verlies van een plooikaart, conform Artikel 3.3.
+6.1. Een afwezigheid wordt uitsluitend als gerechtvaardigd erkend indien de heer in kwestie een geldig doktersattest kan voorleggen, waarin expliciet wordt vermeld dat hij de woning niet mag verlaten en derhalve in de onmogelijkheid verkeert zich te verplaatsen.  
+6.2. Een attest, verstrekt door een beoefenaar der diergeneeskunde, zal onder geen enkel beding enige geldigheid genieten. 6.3. Indien een heer op de vergadering niet fysiek aanwezig is om 22:00 uur, wordt hij automatisch en onherroepelijk als “geplooid” beschouwd, behoudens het in Artikel 6.1 vermelde doktersattest.  
+6.4. Een niet-gerechtvaardigde afwezigheid leidt onvermijdelijk tot verlies van een plooikaart, conform Artikel 3.3.

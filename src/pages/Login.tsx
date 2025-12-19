@@ -41,14 +41,14 @@ export default function Login() {
       login(res.data);
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err.response?.data?.message || "Toegang geweigerd");
     }
   };
 
   return (
     <Container maxWidth='xs' sx={{ display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "100vh" }}>
       <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-        <img src='/plooi_logo.png' alt='PlooiKaart Logo' style={{ width: 180, height: 180, objectFit: "contain" }} />
+        <Box component="img" src='/plooi_logo.png' alt='PlooiKaart Logo' sx={{ width: 180, height: 180, objectFit: "contain" }} />
       </Box>
       <Card>
         <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -59,7 +59,7 @@ export default function Login() {
               </Avatar>
             )}
             <Typography variant='h4' component='h1'>
-              Sign In
+              Zich Kenbaar Maken
             </Typography>
           </Box>
 
@@ -68,7 +68,7 @@ export default function Login() {
           <form onSubmit={handleSubmit}>
             <TextField
               select
-              label='Username'
+              label='Naam des Heeren'
               value={username}
               onChange={handleUsernameChange}
               required
@@ -98,15 +98,15 @@ export default function Login() {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField label='Password' type='password' value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <TextField label='Geheimschrift' type='password' value={password} onChange={(e) => setPassword(e.target.value)} required />
             <Button type='submit' variant='contained' color='primary' fullWidth size='large' sx={{ mt: 2 }}>
-              Login
+              Betreden
             </Button>
           </form>
 
           <Box textAlign='center' mt={2}>
             <Link component={RouterLink} to='/forgot-password' variant='body2'>
-              Forgot Password?
+              Geheimschrift ontgaan?
             </Link>
           </Box>
         </CardContent>

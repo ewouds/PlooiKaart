@@ -93,7 +93,7 @@ export default function AuditTrail() {
         <Box>
           <Typography variant='body2' sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <EventNoteIcon fontSize='small' color='action' />
-            Meeting Date: {meetingDate}
+            {meetingDate ? dayjs(meetingDate).format("DD/MM/YYYY") : "—"}
           </Typography>
 
           {penalizedUserIds && penalizedUserIds.length > 0 && (
@@ -143,11 +143,11 @@ export default function AuditTrail() {
   return (
     <Container maxWidth='md' sx={{ mt: 2, pb: 4 }}>
       <Button component={RouterLink} to='/' startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
-        Back to Dashboard
+        terug
       </Button>
 
       <Typography variant='h4' gutterBottom>
-        Audit Trail
+        Logboek
       </Typography>
 
       <Card variant='outlined' sx={{ mb: 3 }}>
@@ -160,9 +160,9 @@ export default function AuditTrail() {
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <FormControl fullWidth size='small'>
-                  <InputLabel>Filter by User</InputLabel>
+                  <InputLabel>Gebruiker</InputLabel>
                   <Select value={filterUserId} label='Filter by User' onChange={(e) => setFilterUserId(e.target.value)}>
-                    <MenuItem value='ALL'>All Users</MenuItem>
+                    <MenuItem value='ALL'>Alle Gebruikers</MenuItem>
                     {users.map((u) => (
                       <MenuItem key={u._id} value={u._id}>
                         {u.displayName}
@@ -173,11 +173,11 @@ export default function AuditTrail() {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <FormControl fullWidth size='small'>
-                  <InputLabel>Event Type</InputLabel>
+                  <InputLabel>Type Gebeurtenis</InputLabel>
                   <Select value={filterType} label='Event Type' onChange={(e) => setFilterType(e.target.value)}>
                     {uniqueTypes.map((type) => (
                       <MenuItem key={type} value={type}>
-                        {type === "ALL" ? "All Types" : type.replace(/_/g, " ")}
+                        {type === "ALL" ? "Alle Types" : type.replace(/_/g, " ")}
                       </MenuItem>
                     ))}
                   </Select>
@@ -186,7 +186,7 @@ export default function AuditTrail() {
               <Grid size={{ xs: 12, sm: 12, md: 6 }}>
                 <DateRangePicker
                   slots={{ field: SingleInputDateRangeField }}
-                  label='Date Range'
+                  label='Datumbereik'
                   value={dateRange}
                   onChange={(newValue) => setDateRange(newValue)}
                   slotProps={{ textField: { size: "small", fullWidth: true } }}
@@ -198,7 +198,7 @@ export default function AuditTrail() {
       </Card>
 
       {filteredEvents.length === 0 ? (
-        <Typography color='text.secondary'>No audit events found matching your criteria.</Typography>
+        <Typography color='text.secondary'>Geen logboek items gevonden die voldoen aan de criteria.</Typography>
       ) : (
         <Stack spacing={2}>
           {filteredEvents.map((e) => (

@@ -7,7 +7,7 @@ export default function Reglement() {
   return (
     <Container maxWidth='md' sx={{ mt: 2, pb: 4 }}>
       <Button component={RouterLink} to='/' startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
-        Back to Dashboard
+        terug
       </Button>
 
       <Card variant='outlined'>

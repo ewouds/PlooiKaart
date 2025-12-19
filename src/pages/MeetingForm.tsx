@@ -129,14 +129,14 @@ export default function MeetingForm() {
     const presentSet = new Set(presentIds);
     for (const id of excusedIds) {
       if (presentSet.has(id)) {
-        setError("A user cannot be both present and excused");
+        setError("Een heerschap kan niet tegelijkertijd aanwezig en verontschuldigd zijn.");
         return;
       }
     }
 
     for (const t of topUps) {
       if (t.amount <= 0 || t.amount % 5 !== 0) {
-        setError("Top-up amount must be a positive multiple of 5");
+        setError("De bijkoop dient een veelvoud van vijf te bedragen.");
         return;
       }
     }
@@ -153,7 +153,7 @@ export default function MeetingForm() {
       if (err.response?.status === 409 && err.response?.data?.code === "MEETING_EXISTS") {
         setOpenConfirm(true);
       } else {
-        setError(err.response?.data?.message || "Failed to submit meeting");
+        setError(err.response?.data?.message || "Het indienen der vergadering is mislukt.");
       }
     }
   };
@@ -170,7 +170,7 @@ export default function MeetingForm() {
       setOpenConfirm(false);
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to overwrite meeting");
+      setError(err.response?.data?.message || "Het overschrijven der samenkomst is mislukt.");
       setOpenConfirm(false);
     }
   };
@@ -178,11 +178,11 @@ export default function MeetingForm() {
   return (
     <Container maxWidth='sm' sx={{ mt: 2, pb: 4 }}>
       <Button component={RouterLink} to='/' startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
-        Back to Dashboard
+        terug
       </Button>
 
       <Typography variant='h4' gutterBottom>
-        Register Meeting
+        Samenkomst
       </Typography>
 
       {error && (
@@ -196,7 +196,7 @@ export default function MeetingForm() {
           <CardContent>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label='Date'
+                label='Datum der Samenkomst'
                 value={date}
                 onChange={(newValue) => setDate(newValue)}
                 slotProps={{ textField: { fullWidth: true, required: true } }}
@@ -208,7 +208,7 @@ export default function MeetingForm() {
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Attendance
+              Aanwezigen
             </Typography>
             <Stack spacing={2}>
               {users.map((u) => {
@@ -231,10 +231,10 @@ export default function MeetingForm() {
                     </Box>
                     <ToggleButtonGroup value={status} exclusive onChange={(_, newStatus) => handleAttendanceChange(u._id, newStatus)} size='small'>
                       <ToggleButton value='present' color='success' sx={{ px: 2 }}>
-                        <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} /> Present
+                        <CheckCircleIcon fontSize='small' sx={{ mr: 1 }} /> Aanwezig
                       </ToggleButton>
                       <ToggleButton value='excused' color='warning' sx={{ px: 2 }}>
-                        <HelpOutlineIcon fontSize='small' sx={{ mr: 1 }} /> Excused
+                        <HelpOutlineIcon fontSize='small' sx={{ mr: 1 }} /> Ziek
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Box>
@@ -247,14 +247,14 @@ export default function MeetingForm() {
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Top-Ups (Buy 5 Plooikaarten)
+              Bijkoop (5 Plooikaarten)
             </Typography>
 
             {topUps.map((t, i) => (
               <Box key={i} sx={{ p: 2, bgcolor: "background.default", borderRadius: 2, mb: 2, border: "1px solid", borderColor: "divider" }}>
                 <FormControl fullWidth margin='normal'>
-                  <InputLabel>User</InputLabel>
-                  <Select value={t.userId} label='User' onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
+                  <InputLabel>Heerschap</InputLabel>
+                  <Select value={t.userId} label='Heerschap' onChange={(e) => updateTopUp(i, "userId", e.target.value)}>
                     {users.map((u) => (
                       <MenuItem key={u._id} value={u._id}>
                         {u.displayName}
@@ -264,28 +264,28 @@ export default function MeetingForm() {
                 </FormControl>
 
                 <TextField
-                  label='Comment'
+                  label='Toelichting'
                   value={t.comment}
                   onChange={(e) => updateTopUp(i, "comment", e.target.value)}
-                  placeholder='Reason (e.g. Rondje)'
+                  placeholder='Reden (bv. Rondje voor de ganse groep)'
                   fullWidth
                   margin='normal'
                 />
 
                 <Button variant='outlined' color='error' startIcon={<DeleteIcon />} onClick={() => removeTopUp(i)} fullWidth sx={{ mt: 1 }}>
-                  Remove
+                  Verwijderen
                 </Button>
               </Box>
             ))}
 
             <Button variant='outlined' startIcon={<AddIcon />} onClick={addTopUp} fullWidth>
-              Add Top Up
+              Bijkoop toevoegen
             </Button>
           </CardContent>
         </Card>
 
         <Button type='submit' variant='contained' size='large' fullWidth>
-          Submit Meeting
+          Samenkomst indienen
         </Button>
       </form>
 
@@ -295,16 +295,17 @@ export default function MeetingForm() {
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id='alert-dialog-title'>{"Meeting Already Exists"}</DialogTitle>
+        <DialogTitle id='alert-dialog-title'>{"Reeds Bestaande Zitting"}</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            A meeting for this date already exists. Do you want to overwrite it with these new settings?
+            Voorwaar, er is reeds een samenkomst geboekstaafd op deze datum. Wenst gij de bestaande notulen te overschrijven met de onderhavige
+            gegevens?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenConfirm(false)}>Cancel</Button>
+          <Button onClick={() => setOpenConfirm(false)}>Afzien</Button>
           <Button onClick={handleConfirmOverwrite} autoFocus color='error'>
-            Overwrite
+            Overschrijven
           </Button>
         </DialogActions>
       </Dialog>

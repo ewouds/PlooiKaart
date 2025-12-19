@@ -38,7 +38,7 @@ export default function Layout() {
       setEditProfilePicture(res.data.url);
     } catch (error) {
       console.error("Upload failed", error);
-      alert("Failed to upload image");
+      alert("Het uploaden der beeltenis is mislukt");
     } finally {
       setUploading(false);
     }
@@ -93,17 +93,17 @@ export default function Layout() {
           },
         }}
       >
-        <DialogTitle>Update Profile</DialogTitle>
+        <DialogTitle>Profiel Bijwerken</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <Button variant='contained' component='label' disabled={uploading}>
-              {uploading ? "Uploading..." : "Upload Profile Picture"}
+              {uploading ? "Bezig met uploaden..." : "Beeltenis Uploaden"}
               <input type='file' hidden accept='image/*' onChange={handleFileUpload} />
             </Button>
           </Box>
           <TextField
             margin='dense'
-            label='Profile Picture URL'
+            label='URL der Beeltenis'
             fullWidth
             variant='outlined'
             value={editProfilePicture}
@@ -111,9 +111,9 @@ export default function Layout() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenProfile(false)}>Cancel</Button>
+          <Button onClick={() => setOpenProfile(false)}>Afzien</Button>
           <Button onClick={handleUpdateProfile} variant='contained'>
-            Save
+            Opslaan
           </Button>
         </DialogActions>
       </Dialog>

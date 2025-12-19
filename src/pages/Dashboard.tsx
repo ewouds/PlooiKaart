@@ -76,7 +76,7 @@ export default function Dashboard() {
   const series = userIds.map((userId) => {
     const userMeta = safeHistory[0].scores.find((s) => s.userId === userId);
     return {
-      label: userMeta?.name || "Unknown",
+      label: userMeta?.name || "Onbekend",
       data: safeHistory.map((h) => h.scores.find((s) => s.userId === userId)?.score || 0),
       showMark: false,
       curve: "linear" as const,
@@ -92,12 +92,12 @@ export default function Dashboard() {
           </Typography>
         </Card>
 
-        <Stack direction='row' spacing={1} justifyContent='center' mb={4} flexWrap='wrap' useFlexGap sx={{ gap: 1 }}>
+        <Stack direction='row' spacing={1} justifyContent='center' mb={4} flexWrap='wrap' useFlexGap sx={{ gap: 0.5 }}>
           <Button component={RouterLink} to='/meetings/new' variant='outlined' size='large'>
-            Register Meeting
+            Samenkomst
           </Button>
           <Button component={RouterLink} to='/audit' variant='outlined'>
-            Audit Trail
+            Logboek
           </Button>
           <Button component={RouterLink} to='/reglement' variant='outlined'>
             Reglement
@@ -158,7 +158,7 @@ export default function Dashboard() {
 
         {history.length > 0 && (
           <Card sx={{ mt: 3, border: 1, borderColor: "primary.main", opacity: 0.6 }}>
-            <CardHeader title='Progress' />
+            <CardHeader title='Vooruitgang' />
             <CardContent>
               <Box sx={{ width: "100%", height: 300 }}>
                 <LineChart
