@@ -48,7 +48,9 @@ export default function Reglement() {
               2.1. De heer die beroepshalve een luchtvaartuig bestuurt, geniet wegens bewezen stress- en turbulentiegevoeligheid een
               uitzonderingsstatuut.
             </Typography>
-            <Typography paragraph>2.2. Onderhavig statuut verleent hem tien (10) plooikaarten bij aanvang van elk kalenderjaar.</Typography>
+            <Typography paragraph>
+              2.2. Onderhavig statuut verleent hem vijftien (15) plooikaarten in totaal bij aanvang van elk kalenderjaar.
+            </Typography>
           </Box>
 
           <Divider sx={{ my: 3 }} />

@@ -10,7 +10,7 @@ _Goedgekeurd bij meerderheid der aanwezige heerschappen_
 ## Artikel 2: Beroepsmatige luchtvaarders
 
 2.1. De heer die beroepshalve een luchtvaartuig bestuurt, geniet wegens bewezen stress- en turbulentiegevoeligheid een uitzonderingsstatuut.  
-2.2. Onderhavig statuut verleent hem tien (10) plooikaarten bij aanvang van elk kalenderjaar.
+2.2. Onderhavig statuut verleent hem vijftien (15) plooikaarten bij aanvang van elk kalenderjaar.
 
 ## Artikel 3: Voorwaarden tot het werpen der plooikaart
 

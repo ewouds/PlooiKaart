@@ -14,7 +14,7 @@ export async function calculateScores() {
   
   const scores = users.map(user => {
     let score = 5;
-    if (user.isPilot) score += 5;
+    if (user.isPilot) score += 10;
 
     let penalties = 0;
     let topUps = 0;

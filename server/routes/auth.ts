@@ -27,6 +27,12 @@ router.post('/login', async (req, res) => {
 
   const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
   
+  await AuditEvent.create({
+    actorUserId: user._id,
+    type: 'USER_LOGIN',
+    data: { username: user.username }
+  });
+
   res.json({ 
     message: 'Logged in', 
     token, 
@@ -86,7 +92,6 @@ router.post('/password-reset/request', async (req, res) => {
 
 router.post('/password-reset/confirm', async (req, res) => {
   const { userId, token, newPassword } = req.body;
-  console.log(`[DEBUG] Reset confirm for user: ${userId}`);
 
   const resetTokens = await PasswordResetToken.find({
     userId,
@@ -95,7 +100,6 @@ router.post('/password-reset/confirm', async (req, res) => {
   });
 
   if (resetTokens.length === 0) {
-    console.log('[DEBUG] No valid reset token found in DB (or expired/used)');
     return res.status(400).json({ message: 'Invalid or expired token' });
   }
 
@@ -109,7 +113,6 @@ router.post('/password-reset/confirm', async (req, res) => {
   }
 
   if (!validResetTokenDoc) {
-    console.log('[DEBUG] Token hash mismatch (checked against ' + resetTokens.length + ' valid tokens)');
     return res.status(400).json({ message: 'Invalid or expired token' });
   }
 

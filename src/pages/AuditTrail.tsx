@@ -1,4 +1,5 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ClearIcon from "@mui/icons-material/Clear";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PersonIcon from "@mui/icons-material/Person";
@@ -42,15 +43,31 @@ export default function AuditTrail() {
   const [filterUserId, setFilterUserId] = useState("ALL");
   const [dateRange, setDateRange] = useState<DateRange<Dayjs>>([null, null]);
   const [filterType, setFilterType] = useState("ALL");
+  const [filterEventDate, setFilterEventDate] = useState("ALL");
 
   useEffect(() => {
-    client.get("/audit").then((res) => setEvents(res.data));
+    const params = filterEventDate !== "ALL" ? { date: filterEventDate } : {};
+    client.get("/audit", { params }).then((res) => setEvents(res.data));
     client.get("/users/scores").then((res) => setUsers(res.data));
-  }, []);
+  }, [filterEventDate]);
 
   const uniqueTypes = useMemo(() => {
     const types = new Set(events.map((e) => e.type));
     return ["ALL", ...Array.from(types)];
+  }, [events]);
+
+  const uniqueEventDates = useMemo(() => {
+    const dates = new Set(
+      events
+        .filter((e) => e.type === "MEETING_SUBMITTED" || e.type === "MEETING_OVERWRITTEN")
+        .map((e) => e.data.meetingDate)
+        .filter(Boolean)
+    );
+    return ["ALL", ...Array.from(dates)].sort((a, b) => {
+      if (a === "ALL") return -1;
+      if (b === "ALL") return 1;
+      return dayjs(b).valueOf() - dayjs(a).valueOf();
+    });
   }, [events]);
 
   const filteredEvents = useMemo(() => {
@@ -85,6 +102,13 @@ export default function AuditTrail() {
   const getUserName = (id: string) => {
     const user = users.find((u) => u._id === id);
     return user ? user.displayName : id;
+  };
+
+  const handleResetFilters = () => {
+    setFilterUserId("ALL");
+    setDateRange([null, null]);
+    setFilterType("ALL");
+    setFilterEventDate("ALL");
   };
 
   const renderDetails = (event: AuditEvent) => {
@@ -153,9 +177,14 @@ export default function AuditTrail() {
 
       <Card variant='outlined' sx={{ mb: 3 }}>
         <CardContent>
-          <Stack direction='row' alignItems='center' gap={1} mb={2}>
-            <FilterListIcon color='primary' />
-            <Typography variant='h6'>Selectiecriteria</Typography>
+          <Stack direction='row' alignItems='center' justifyContent='space-between' mb={2}>
+            <Stack direction='row' alignItems='center' gap={1}>
+              <FilterListIcon color='primary' />
+              <Typography variant='h6'>Selectiecriteria</Typography>
+            </Stack>
+            <Button variant='outlined' size='small' startIcon={<ClearIcon />} onClick={handleResetFilters}>
+              Reset
+            </Button>
           </Stack>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Grid container spacing={2}>
@@ -184,7 +213,19 @@ export default function AuditTrail() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <FormControl fullWidth size='small'>
+                  <InputLabel>Gebeurtenis Datum</InputLabel>
+                  <Select value={filterEventDate} label='Event Date' onChange={(e) => setFilterEventDate(e.target.value)}>
+                    {uniqueEventDates.map((date) => (
+                      <MenuItem key={date} value={date}>
+                        {date === "ALL" ? "Alle Data" : dayjs(date).format("DD/MM/YYYY")}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <DateRangePicker
                   slots={{ field: SingleInputDateRangeField }}
                   label='Temporeel Kader'
