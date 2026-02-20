@@ -22,7 +22,6 @@ router.get('/:date', authenticateToken, async (req, res) => {
 
 router.post('/', authenticateToken, async (req: AuthRequest, res) => {
   const { date, presentUserIds, excusedUserIds, topUps, overwrite } = req.body;
-  console.log(`Creating meeting for date: ${date} (overwrite: ${overwrite})`);
   const userId = req.user?.userId;
 
   // 2. Validate Unique Date

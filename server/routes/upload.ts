@@ -14,8 +14,6 @@ const upload = multer({
 
 router.post('/upload', authenticateToken, upload.single('file'), async (req: any, res) => {
   try {
-    console.log('[UPLOAD] user:', req.user);
-    console.log('[UPLOAD] has file:', !!req.file);
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     let rawConn = process.env.AZURE_STORAGE_CONNECTION_STRING;
@@ -34,15 +32,8 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req: any
     // If someone pasted extra garbage before the URL (we've seen this), try to find the first 'http'
     const httpIndex = rawConn.search(/https?:\/\//i);
     if (httpIndex > 0) {
-      console.warn('[UPLOAD] Trimming leading characters before http:// in AZURE_STORAGE_CONNECTION_STRING');
       rawConn = rawConn.substring(httpIndex);
     }
-
-    // Log diagnostics: length and a masked preview (don't print keys/signatures).
-    const masked = rawConn.replace(/sig=[^&\s]+/i, 'sig=***').replace(/AccountKey=[^;\s]+/i, 'AccountKey=***');
-    console.log('[UPLOAD] AZURE_STORAGE_CONNECTION_STRING length:', rawConn.length);
-    console.log('[UPLOAD] AZURE_STORAGE_CONNECTION_STRING preview:', masked.substring(0, 200));
-    console.log('[UPLOAD] startsWith https?:', /^https?:\/\//i.test(rawConn));
 
     let blobServiceClient: BlobServiceClient;
     try {

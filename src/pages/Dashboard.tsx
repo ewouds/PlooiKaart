@@ -213,6 +213,7 @@ export default function Dashboard() {
               <Box sx={{ width: "100%", height: 300 }}>
                 <LineChart
                   xAxis={[{ scaleType: "point", data: xLabels }]}
+                  yAxis={[{ min: 0, max: 16 }]}
                   series={series}
                   height={280}
                   margin={{ left: 30, right: 10, top: 10, bottom: 20 }}

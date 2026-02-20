@@ -58,7 +58,7 @@ export async function calculateScoreHistory() {
   const userScores = new Map<string, number>();
   users.forEach(user => {
     let score = 5;
-    if (user.isPilot) score += 5;
+    if (user.isPilot) score += 10;
     userScores.set(user._id.toString(), score);
   });
 

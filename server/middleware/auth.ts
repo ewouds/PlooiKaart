@@ -14,10 +14,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     token = authHeader.split(' ')[1];
   }
 
-  console.log('[AUTH] Token source:', authHeader ? 'Header' : 'None');
-
   if (!token) {
-    console.log('[AUTH] No token found - unauthorized');
     return res.sendStatus(401);
   }
 
