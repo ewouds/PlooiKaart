@@ -43,7 +43,8 @@ router.post('/login', async (req, res) => {
       email: user.email,
       isPilot: user.isPilot, 
       profilePicture: user.profilePicture, 
-      theme: user.theme 
+      theme: user.theme,
+      progressChartSelectedUserIds: user.progressChartSelectedUserIds || []
     } 
   });
 });

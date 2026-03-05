@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   isPilot: { type: Boolean, default: false },
   theme: { type: String, default: 'light' },
+  progressChartSelectedUserIds: { type: [String], default: [] },
   profilePicture: { type: String },
   passwordHash: { type: String },
 }, { timestamps: true });

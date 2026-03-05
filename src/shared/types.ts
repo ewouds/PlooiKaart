@@ -4,6 +4,7 @@ export interface User {
   username: string;
   profilePicture?: string;
   role?: string;
+  progressChartSelectedUserIds?: string[];
 }
 
 export interface ScoreUser extends User {

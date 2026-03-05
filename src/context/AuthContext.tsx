@@ -9,6 +9,7 @@ interface User {
   isPilot: boolean;
   theme?: "light" | "dark";
   profilePicture?: string;
+  progressChartSelectedUserIds?: string[];
 }
 
 interface AuthContextType {

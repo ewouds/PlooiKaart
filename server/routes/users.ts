@@ -48,6 +48,26 @@ router.patch('/me/theme', authenticateToken, async (req: AuthRequest, res) => {
   res.json(user);
 });
 
+router.patch('/me/progress-chart-selection', authenticateToken, async (req: AuthRequest, res) => {
+  const { selectedUserIds } = req.body;
+
+  if (!Array.isArray(selectedUserIds) || selectedUserIds.some((id) => typeof id !== 'string')) {
+    return res.status(400).json({ message: 'selectedUserIds must be an array of strings' });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?.userId,
+    { progressChartSelectedUserIds: selectedUserIds },
+    { new: true }
+  ).select('-passwordHash');
+
+  if (!user) {
+    return res.sendStatus(404);
+  }
+
+  res.json(user);
+});
+
 router.patch('/me', authenticateToken, async (req: AuthRequest, res) => {
   const { displayName, profilePicture } = req.body;
   

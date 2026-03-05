@@ -64,6 +64,7 @@ export default function Dashboard() {
   const { mode } = useThemeContext();
   const [scores, setScores] = useState<ScoreUser[]>([]);
   const [history, setHistory] = useState<HistoryPoint[]>([]);
+  const [selectedProgressUserIds, setSelectedProgressUserIds] = useState<string[]>([]);
   const [meetingDates, setMeetingDates] = useState<string[]>([]);
   const navigate = useNavigate();
 
@@ -99,16 +100,65 @@ export default function Dashboard() {
   const safeHistory = Array.isArray(history) ? history : [];
   const xLabels = safeHistory.map((h) => h.date);
   const userIds = safeHistory.length > 0 ? safeHistory[0].scores.map((s) => s.userId) : [];
+  const userIdsKey = userIds.join("|");
+  const chartColors = [
+    theme.palette.primary.main,
+    theme.palette.secondary.main,
+    theme.palette.error.main,
+    theme.palette.warning.main,
+    theme.palette.info.main,
+    theme.palette.success.main,
+  ];
 
-  const series = userIds.map((userId) => {
+  useEffect(() => {
+    if (userIds.length === 0) {
+      setSelectedProgressUserIds([]);
+      return;
+    }
+
+    setSelectedProgressUserIds((currentSelection) => {
+      if (currentSelection.length === 0) {
+        const storedSelection = (user?.progressChartSelectedUserIds || []).filter((id) => userIds.includes(id));
+        return storedSelection.length > 0 ? storedSelection : userIds;
+      }
+
+      const stillExisting = currentSelection.filter((id) => userIds.includes(id));
+      const newUserIds = userIds.filter((id) => !stillExisting.includes(id));
+      return [...stillExisting, ...newUserIds];
+    });
+  }, [user?.progressChartSelectedUserIds, userIdsKey]);
+
+  const progressSeries = userIds.map((userId, index) => {
     const userMeta = safeHistory[0].scores.find((s) => s.userId === userId);
     return {
+      userId,
       label: userMeta?.name || "Onbekend",
       data: safeHistory.map((h) => h.scores.find((s) => s.userId === userId)?.score || 0),
       showMark: false,
       curve: "linear" as const,
+      color: chartColors[index % chartColors.length],
     };
   });
+
+  const visibleSeries = progressSeries.filter((series) => selectedProgressUserIds.includes(series.userId));
+  const maxVisibleScore = visibleSeries.reduce(
+    (currentMax, series) => series.data.reduce((seriesMax, score) => Math.max(seriesMax, score), currentMax),
+    0,
+  );
+  const yAxisMax = maxVisibleScore > 0 ? maxVisibleScore + 1 : 1;
+
+  const toggleProgressUser = (userId: string) => {
+    setSelectedProgressUserIds((currentSelection) => {
+      const isSelected = currentSelection.includes(userId);
+      const nextSelection = isSelected ? currentSelection.filter((id) => id !== userId) : [...currentSelection, userId];
+
+      client.patch("/users/me/progress-chart-selection", { selectedUserIds: nextSelection }).catch((error) => {
+        console.error("Failed to save progress chart selection", error);
+      });
+
+      return nextSelection;
+    });
+  };
 
   return (
     <>
@@ -210,14 +260,50 @@ export default function Dashboard() {
           <Card sx={{ mt: 3, border: 1, borderColor: "primary.main", opacity: 0.6 }}>
             <CardHeader title='Vooruitgang' />
             <CardContent>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2, gap: 0.5 }}>
+                {progressSeries.map((series) => {
+                  const isSelected = selectedProgressUserIds.includes(series.userId);
+                  return (
+                    <Button
+                      key={series.userId}
+                      variant={isSelected ? "contained" : "outlined"}
+                      size='small'
+                      onClick={() => toggleProgressUser(series.userId)}
+                      sx={{ textTransform: "none" }}
+                    >
+                      <Box
+                        sx={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: "50%",
+                          bgcolor: series.color,
+                          mr: 1,
+                          opacity: isSelected ? 1 : 0.5,
+                        }}
+                      />
+                      {series.label}
+                    </Button>
+                  );
+                })}
+              </Stack>
+
               <Box sx={{ width: "100%", height: 300 }}>
-                <LineChart
-                  xAxis={[{ scaleType: "point", data: xLabels }]}
-                  yAxis={[{ min: 0, max: 16 }]}
-                  series={series}
-                  height={280}
-                  margin={{ left: 30, right: 10, top: 10, bottom: 20 }}
-                />
+                {visibleSeries.length > 0 ? (
+                  <LineChart
+                    xAxis={[{ scaleType: "point", data: xLabels }]}
+                    yAxis={[{ min: 0, max: yAxisMax }]}
+                    series={visibleSeries}
+                    height={280}
+                    margin={{ left: 30, right: 10, top: 10, bottom: 20 }}
+                    slotProps={{ legend: { hidden: true } as any }}
+                  />
+                ) : (
+                  <Stack sx={{ height: 280 }} alignItems='center' justifyContent='center'>
+                    <Typography variant='body2' color='text.secondary'>
+                      Geen spelers geselecteerd.
+                    </Typography>
+                  </Stack>
+                )}
               </Box>
             </CardContent>
           </Card>
