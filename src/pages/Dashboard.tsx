@@ -22,7 +22,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -66,6 +66,7 @@ export default function Dashboard() {
   const [history, setHistory] = useState<HistoryPoint[]>([]);
   const [selectedProgressUserIds, setSelectedProgressUserIds] = useState<string[]>([]);
   const [meetingDates, setMeetingDates] = useState<string[]>([]);
+  const previousProgressUserIdsRef = useRef<string[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -113,19 +114,29 @@ export default function Dashboard() {
   useEffect(() => {
     if (userIds.length === 0) {
       setSelectedProgressUserIds([]);
+      previousProgressUserIdsRef.current = [];
       return;
     }
 
+    const previousUserIds = previousProgressUserIdsRef.current;
+    const storedSelection = (user?.progressChartSelectedUserIds || []).filter((id) => userIds.includes(id));
+    const newlyAppearedUserIds = userIds.filter((id) => !previousUserIds.includes(id));
+
     setSelectedProgressUserIds((currentSelection) => {
       if (currentSelection.length === 0) {
-        const storedSelection = (user?.progressChartSelectedUserIds || []).filter((id) => userIds.includes(id));
         return storedSelection.length > 0 ? storedSelection : userIds;
       }
 
       const stillExisting = currentSelection.filter((id) => userIds.includes(id));
-      const newUserIds = userIds.filter((id) => !stillExisting.includes(id));
-      return [...stillExisting, ...newUserIds];
+
+      if (newlyAppearedUserIds.length === 0) {
+        return stillExisting;
+      }
+
+      return [...stillExisting, ...newlyAppearedUserIds];
     });
+
+    previousProgressUserIdsRef.current = userIds;
   }, [user?.progressChartSelectedUserIds, userIdsKey]);
 
   const progressSeries = userIds.map((userId, index) => {
