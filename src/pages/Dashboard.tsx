@@ -33,6 +33,7 @@ interface ScoreUser {
   _id: string;
   displayName: string;
   score: number;
+  isPilot?: boolean;
   profilePicture?: string;
   [key: string]: any;
 }
@@ -103,12 +104,21 @@ export default function Dashboard() {
   const userIds = safeHistory.length > 0 ? safeHistory[0].scores.map((s) => s.userId) : [];
   const userIdsKey = userIds.join("|");
   const chartColors = [
-    theme.palette.primary.main,
-    theme.palette.secondary.main,
-    theme.palette.error.main,
-    theme.palette.warning.main,
-    theme.palette.info.main,
-    theme.palette.success.main,
+    "#1F77B4",
+    "#D62728",
+    "#2CA02C",
+    "#9467BD",
+    "#FF7F0E",
+    "#17BECF",
+    "#E377C2",
+    "#8C564B",
+    "#BCBD22",
+    "#7F7F7F",
+    "#003F5C",
+    "#FFA600",
+    "#7A5195",
+    "#EF5675",
+    "#2F4B7C",
   ];
 
   useEffect(() => {
@@ -151,6 +161,15 @@ export default function Dashboard() {
     };
   });
 
+  const pilotUserIds = scores.filter((s) => s.isPilot).map((s) => s._id).filter((id) => userIds.includes(id));
+  const areAllPilotsSelected = pilotUserIds.length > 0 && pilotUserIds.every((id) => selectedProgressUserIds.includes(id));
+
+  const persistProgressSelection = (selectedUserIds: string[]) => {
+    client.patch("/users/me/progress-chart-selection", { selectedUserIds }).catch((error) => {
+      console.error("Failed to save progress chart selection", error);
+    });
+  };
+
   const visibleSeries = progressSeries.filter((series) => selectedProgressUserIds.includes(series.userId));
   const maxVisibleScore = visibleSeries.reduce(
     (currentMax, series) => series.data.reduce((seriesMax, score) => Math.max(seriesMax, score), currentMax),
@@ -163,9 +182,23 @@ export default function Dashboard() {
       const isSelected = currentSelection.includes(userId);
       const nextSelection = isSelected ? currentSelection.filter((id) => id !== userId) : [...currentSelection, userId];
 
-      client.patch("/users/me/progress-chart-selection", { selectedUserIds: nextSelection }).catch((error) => {
-        console.error("Failed to save progress chart selection", error);
-      });
+      persistProgressSelection(nextSelection);
+
+      return nextSelection;
+    });
+  };
+
+  const togglePilots = () => {
+    if (pilotUserIds.length === 0) return;
+
+    setSelectedProgressUserIds((currentSelection) => {
+      const pilotsSelected = pilotUserIds.every((id) => currentSelection.includes(id));
+
+      const nextSelection = pilotsSelected
+        ? currentSelection.filter((id) => !pilotUserIds.includes(id))
+        : Array.from(new Set([...currentSelection, ...pilotUserIds]));
+
+      persistProgressSelection(nextSelection);
 
       return nextSelection;
     });
@@ -271,6 +304,12 @@ export default function Dashboard() {
           <Card sx={{ mt: 3, border: 1, borderColor: "primary.main", opacity: 0.6 }}>
             <CardHeader title='Vooruitgang' />
             <CardContent>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 1, gap: 0.5 }}>
+                <Button variant={areAllPilotsSelected ? "contained" : "outlined"} size='small' onClick={togglePilots} disabled={pilotUserIds.length === 0}>
+                  {areAllPilotsSelected ? "Piloten excluden" : "Piloten includen"}
+                </Button>
+              </Stack>
+
               <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2, gap: 0.5 }}>
                 {progressSeries.map((series) => {
                   const isSelected = selectedProgressUserIds.includes(series.userId);
